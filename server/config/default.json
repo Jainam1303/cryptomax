@@ -1,0 +1,7 @@
+{
+  "mongoURI": "mongodb://localhost:27017/crypto-investment-platform",
+  "jwtSecret": "crypto_investment_secret_token",
+  "jwtExpiration": "24h",
+  "environment": "development",
+  "port": 5000
+}
