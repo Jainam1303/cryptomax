@@ -22,10 +22,12 @@ export const login = createAsyncThunk(
       const res = await api.post('/api/auth/login', credentials);
       const { token } = res.data;
 
-      localStorage.setItem('token', token);
-      setAuthToken(token);
-      thunkAPI.dispatch(loginSuccess({ token }));
-      thunkAPI.dispatch(loadUser());
+      if (token) {
+        localStorage.setItem('token', token);
+        setAuthToken(token);
+        thunkAPI.dispatch(loginSuccess({ token }));
+        thunkAPI.dispatch(loadUser());
+      }
 
       return res.data;
     } catch (err: any) {
@@ -45,10 +47,12 @@ export const register = createAsyncThunk(
       const res = await api.post('/api/auth/register', formData);
       const { token } = res.data;
 
-      localStorage.setItem('token', token);
-      setAuthToken(token);
-      thunkAPI.dispatch(loginSuccess({ token }));
-      thunkAPI.dispatch(loadUser());
+      if (token) {
+        localStorage.setItem('token', token);
+        setAuthToken(token);
+        thunkAPI.dispatch(loginSuccess({ token }));
+        thunkAPI.dispatch(loadUser());
+      }
 
       return res.data;
     } catch (err: any) {
