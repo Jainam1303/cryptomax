@@ -1,15 +1,17 @@
+require('dotenv').config(); // 👈 Load .env first
+
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 const routes = require('./routes');
-const config = require('config');
+const authRoutes = require('./routes/api/auth'); 
 
 // Initialize Express
 const app = express();
 
 // Connect to MongoDB
-connectDB();
+connectDB(); // 👈 uses process.env.MONGO_URI
 
 // Middleware
 app.use(express.json({ extended: false }));
@@ -22,7 +24,10 @@ app.use('/', routes);
 app.use(errorHandler);
 
 // Define port
-const PORT = process.env.PORT || config.get('port') || 5000;
+const PORT = process.env.PORT || 5000;
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.use('/api/auth', require('./routes/api/auth'));
+

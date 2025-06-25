@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Wallet = require('../models/Wallet');
 const generateToken = require('../utils/generateToken');
 
+
 // @route   POST api/auth/register
 // @desc    Register user
 // @access  Public

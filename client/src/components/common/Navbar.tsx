@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Menu, X, User, LogOut } from 'lucide-react';
-import { logout } from '../../redux/thunks/authThunks';
+import { logoutUser } from '../../redux/thunks/authThunks'; // thunk for async logout
 import { RootState, AppDispatch } from '../../redux/store';
 import ThemeToggle from './ThemeToggle';
 
@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     closeMenus();
   };
 

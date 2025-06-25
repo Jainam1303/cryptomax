@@ -2,13 +2,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
+  appType: 'spa',
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src')
-    }
+  esbuild: {
+    loader: 'tsx',
+    include: /src\/.*\.[tj]sx?$/, // ✅ this line fixes your error
   },
   server: {
     port: 3000,
@@ -16,7 +15,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-        secure: false
+        secure: false,
       }
     }
   },

@@ -1,0 +1,31 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../services/api';
+
+// ✅ Get user's investment portfolio
+export const getPortfolio = createAsyncThunk(
+  'investment/getPortfolio',
+  async (_, thunkAPI) => {
+    try {
+      const res = await api.get('/api/investments/portfolio');
+      return res.data;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue('Failed to load portfolio');
+    }
+  }
+);
+
+// ✅ Make a new investment
+export const createInvestment = createAsyncThunk(
+  'investment/createInvestment',
+  async (
+    data: { cryptoId: string; amount: number },
+    thunkAPI
+  ) => {
+    try {
+      const res = await api.post('/api/investments', data);
+      return res.data;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue('Investment failed');
+    }
+  }
+);
