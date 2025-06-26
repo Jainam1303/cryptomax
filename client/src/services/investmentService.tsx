@@ -3,7 +3,7 @@ import { Investment, Portfolio, InvestmentData } from '../types';
 
 interface InvestmentResponse {
   investment: Investment;
-  transaction: Transaction;
+  transaction: IDBTransaction;
 }
 
 // Get investments

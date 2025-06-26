@@ -6,6 +6,7 @@ import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency } from '../../utils/formatters';
 import Card from '../ui/Card';
 import Spinner from '../ui/Spinner';
+import { Transaction } from '../../types';
 
 const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -201,7 +202,7 @@ const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-dark-200 divide-y divide-gray-200 dark:divide-gray-700">
-                {dashboardData.recentTransactions.map((transaction) => (
+                {dashboardData.recentTransactions.map((transaction: Transaction) => (
                   <tr key={transaction._id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                       {typeof transaction.user === 'object' ? transaction.user.name : 'Unknown'}

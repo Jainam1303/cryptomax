@@ -40,11 +40,24 @@ const WithdrawalRequests: React.FC = () => {
     
     if (!status) return;
     
-    await dispatch(processWithdrawalRequest({
-      id: selectedRequest,
-      status,
-      adminNotes
-    }));
+    {withdrawalRequests.map((request) => (
+  <div key={request._id} className="request-item">
+    <p>{request.user.name} - {request.amount}</p>
+    <button
+      onClick={() =>
+        dispatch(processWithdrawalRequest({
+          requestId: request._id,
+          status: 'approved',
+          adminNotes: 'Processed manually'
+        }))
+      }
+    >
+      Approve
+    </button>
+  </div>
+))}
+
+
     
     setIsModalOpen(false);
     setSelectedRequest(null);

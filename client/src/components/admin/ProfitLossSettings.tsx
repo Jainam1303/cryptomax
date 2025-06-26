@@ -34,10 +34,10 @@ const ProfitLossSettings: React.FC = () => {
     if (!selectedInvestment) return;
     
     await dispatch(adjustInvestment({
-      id: selectedInvestment,
-      enabled: adjustmentEnabled,
-      percentage: parseFloat(adjustmentPercentage)
-    }));
+  investmentId: selectedInvestment,
+  adjustment: parseFloat(adjustmentPercentage)
+}));
+
     
     setIsModalOpen(false);
     setSelectedInvestment(null);

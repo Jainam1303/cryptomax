@@ -30,12 +30,12 @@ export const getCryptoById = createAsyncThunk(
 // ✅ Get price history for chart
 export const getPriceHistory = createAsyncThunk(
   'crypto/getPriceHistory',
-  async (id: string, thunkAPI) => {
+  async ({ id, timeframe }: { id: string; timeframe: string }, thunkAPI) => {
     try {
-      const res = await api.get(`/api/crypto/${id}/history`);
+      const res = await api.get(`/api/crypto/${id}/history?timeframe=${timeframe}`);
       return res.data;
     } catch (err: any) {
-      return thunkAPI.rejectWithValue('Failed to fetch price history');
+      return thunkAPI.rejectWithValue('Failed to fetch chart data');
     }
   }
 );

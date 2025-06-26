@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { WithdrawalData } from '../../types';
 
 // ✅ Get wallet balance & summary
 export const getWallet = createAsyncThunk(
@@ -30,12 +31,12 @@ export const getTransactions = createAsyncThunk(
 // ✅ Deposit funds
 export const deposit = createAsyncThunk(
   'wallet/deposit',
-  async (amount: number, thunkAPI) => {
+  async (data: { amount: number; paymentMethod: string }, thunkAPI) => {
     try {
-      const res = await api.post('/api/wallet/deposit', { amount });
+      const res = await api.post('/api/wallet/deposit', data);
       return res.data;
     } catch (err: any) {
-      return thunkAPI.rejectWithValue('Deposit failed');
+      return thunkAPI.rejectWithValue(err.response?.data?.message || 'Deposit failed');
     }
   }
 );
@@ -56,9 +57,9 @@ export const withdraw = createAsyncThunk(
 // ✅ Request withdrawal (used for admin approval flow)
 export const requestWithdrawal = createAsyncThunk(
   'wallet/requestWithdrawal',
-  async (amount: number, thunkAPI) => {
+  async (data: WithdrawalData, thunkAPI) => {
     try {
-      const res = await api.post('/api/wallet/request-withdrawal', { amount });
+      const res = await api.post('/api/wallet/request-withdrawal', data);
       return res.data;
     } catch (err: any) {
       return thunkAPI.rejectWithValue('Withdrawal request failed');

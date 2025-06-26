@@ -56,21 +56,28 @@ export const getWithdrawalRequests = createAsyncThunk(
   }
 );
 
-// ✅ Process withdrawal request
-export const handleWithdrawal = createAsyncThunk(
-  'admin/handleWithdrawal',
-  async ({ requestId, status }: { requestId: string; status: string }, thunkAPI) => {
+// ✅ Process withdrawal request with adminNotes
+export const processWithdrawalRequest = createAsyncThunk(
+  'admin/processWithdrawalRequest',
+  async (
+    {
+      requestId,
+      status,
+      adminNotes,
+    }: { requestId: string; status: string; adminNotes?: string },
+    thunkAPI
+  ) => {
     try {
-      const res = await api.put(`/api/admin/withdrawals/${requestId}`, { status });
+      const res = await api.put(`/api/admin/withdrawals/${requestId}`, {
+        status,
+        adminNotes,
+      });
       return res.data;
     } catch (err: any) {
       return thunkAPI.rejectWithValue('Failed to update withdrawal status');
     }
   }
 );
-
-// ✅ Alias
-export { handleWithdrawal as processWithdrawalRequest };
 
 // ✅ Adjust investment profit/loss
 export const adjustInvestment = createAsyncThunk(
@@ -86,6 +93,7 @@ export const adjustInvestment = createAsyncThunk(
     }
   }
 );
+
 // ✅ Get all investments (admin scope)
 export const getInvestments = createAsyncThunk(
   'admin/getInvestments',
@@ -98,6 +106,8 @@ export const getInvestments = createAsyncThunk(
     }
   }
 );
+
+// ✅ Get cryptos (forwarded from cryptoThunks)
 export { getCryptos } from './cryptoThunks';
 
 // ✅ Update system-wide crypto settings (e.g., fees, limits, global config)
@@ -112,4 +122,3 @@ export const updateCryptoSettings = createAsyncThunk(
     }
   }
 );
-
