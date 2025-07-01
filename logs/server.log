@@ -1,0 +1,8 @@
+📡 Starting server...
+
+> crypto-investment-platform-server@1.0.0 start
+> node server.js
+
+Server running on port 5000
+❌ MongoDB connection error: connect ECONNREFUSED 127.0.0.1:27017
+⚠️ App will continue without database (using mock data).
