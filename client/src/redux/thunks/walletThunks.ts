@@ -41,28 +41,15 @@ export const deposit = createAsyncThunk(
   }
 );
 
-// ✅ Withdraw funds immediately
+// ✅ Request withdrawal (admin approval flow)
 export const withdraw = createAsyncThunk(
   'wallet/withdraw',
-  async (amount: number, thunkAPI) => {
-    try {
-      const res = await api.post('/api/wallet/withdraw', { amount });
-      return res.data;
-    } catch (err: any) {
-      return thunkAPI.rejectWithValue('Withdrawal failed');
-    }
-  }
-);
-
-// ✅ Request withdrawal (used for admin approval flow)
-export const requestWithdrawal = createAsyncThunk(
-  'wallet/requestWithdrawal',
   async (data: WithdrawalData, thunkAPI) => {
     try {
-      const res = await api.post('/api/wallet/request-withdrawal', data);
+      const res = await api.post('/api/wallet/withdraw', data);
       return res.data;
     } catch (err: any) {
-      return thunkAPI.rejectWithValue('Withdrawal request failed');
+      return thunkAPI.rejectWithValue(err.response?.data?.msg || 'Withdrawal failed');
     }
   }
 );

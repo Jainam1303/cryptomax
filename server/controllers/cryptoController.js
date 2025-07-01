@@ -55,7 +55,32 @@ exports.getCryptos = async (req, res) => {
 // @access  Private
 exports.getCryptoById = async (req, res) => {
   try {
-    const crypto = await Crypto.findById(req.params.id);
+    let crypto;
+    
+    try {
+      // Try to find by MongoDB ObjectId first
+      crypto = await Crypto.findById(req.params.id);
+    } catch (objectIdError) {
+      // If ObjectId fails, try to find by symbol or name
+      crypto = await Crypto.findOne({
+        $or: [
+          { symbol: req.params.id.toUpperCase() },
+          { name: { $regex: new RegExp(req.params.id, 'i') } },
+          { _id: req.params.id } // In case it's a string ID in mock data
+        ]
+      });
+    }
+    
+    // If still not found and we have mock data, try mock data
+    if (!crypto) {
+      console.log('🔍 Crypto not found in database, checking mock data');
+      const mockCryptos = loadMockCryptos();
+      crypto = mockCryptos.find(c => 
+        c._id === req.params.id || 
+        c.symbol.toLowerCase() === req.params.id.toLowerCase() ||
+        c.name.toLowerCase() === req.params.id.toLowerCase()
+      );
+    }
     
     if (!crypto) {
       return res.status(404).json({ msg: 'Cryptocurrency not found' });
@@ -64,11 +89,6 @@ exports.getCryptoById = async (req, res) => {
     res.json(crypto);
   } catch (err) {
     console.error('Get crypto by ID error:', err.message);
-    
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Cryptocurrency not found' });
-    }
-    
     res.status(500).json({ msg: 'Server error' });
   }
 };
@@ -78,7 +98,30 @@ exports.getCryptoById = async (req, res) => {
 // @access  Private
 exports.getPriceHistory = async (req, res) => {
   try {
-    const crypto = await Crypto.findById(req.params.id);
+    let crypto;
+    
+    try {
+      // Try to find by MongoDB ObjectId first
+      crypto = await Crypto.findById(req.params.id);
+    } catch (objectIdError) {
+      // If ObjectId fails, try to find by symbol or name
+      crypto = await Crypto.findOne({
+        $or: [
+          { symbol: req.params.id.toUpperCase() },
+          { name: { $regex: new RegExp(req.params.id, 'i') } }
+        ]
+      });
+    }
+    
+    // If still not found, try mock data
+    if (!crypto) {
+      const mockCryptos = loadMockCryptos();
+      crypto = mockCryptos.find(c => 
+        c._id === req.params.id || 
+        c.symbol.toLowerCase() === req.params.id.toLowerCase() ||
+        c.name.toLowerCase() === req.params.id.toLowerCase()
+      );
+    }
     
     if (!crypto) {
       return res.status(404).json({ msg: 'Cryptocurrency not found' });
@@ -86,28 +129,28 @@ exports.getPriceHistory = async (req, res) => {
     
     // Get price history for the specified timeframe
     const { timeframe } = req.query;
-    let priceHistory;
+    let priceHistory = crypto.priceHistory || [];
     
     switch (timeframe) {
       case '1d':
         // Last 24 hours (assuming hourly data points)
-        priceHistory = crypto.priceHistory.slice(-24);
+        priceHistory = priceHistory.slice(-24);
         break;
       case '7d':
         // Last 7 days (assuming hourly data points)
-        priceHistory = crypto.priceHistory.slice(-168);
+        priceHistory = priceHistory.slice(-168);
         break;
       case '30d':
         // Last 30 days (assuming hourly data points)
-        priceHistory = crypto.priceHistory.slice(-720);
+        priceHistory = priceHistory.slice(-720);
         break;
       case '1y':
         // Last year (assuming daily data points)
-        priceHistory = crypto.priceHistory.filter((p, i) => i % 24 === 0).slice(-365);
+        priceHistory = priceHistory.filter((p, i) => i % 24 === 0).slice(-365);
         break;
       default:
         // Default to last 24 hours
-        priceHistory = crypto.priceHistory.slice(-24);
+        priceHistory = priceHistory.slice(-24);
     }
     
     res.json(priceHistory);

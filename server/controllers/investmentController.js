@@ -2,6 +2,21 @@ const Investment = require('../models/Investment');
 const Crypto = require('../models/Crypto');
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
+const fs = require('fs');
+const path = require('path');
+
+// Load mock crypto data when database is unavailable
+const loadMockCryptos = () => {
+  try {
+    const mockDataPath = path.join(__dirname, '../data/cryptos.json');
+    if (fs.existsSync(mockDataPath)) {
+      return JSON.parse(fs.readFileSync(mockDataPath, 'utf8'));
+    }
+  } catch (error) {
+    console.log('❌ Could not load mock crypto data');
+  }
+  return [];
+};
 
 // @route   GET api/investments
 // @desc    Get user investments
@@ -31,8 +46,30 @@ exports.createInvestment = async (req, res) => {
       return res.status(400).json({ msg: 'Amount must be greater than 0' });
     }
     
-    // Get crypto details
-    const crypto = await Crypto.findById(cryptoId);
+    // Get crypto details - handle both ObjectId and string IDs
+    let crypto;
+    try {
+      crypto = await Crypto.findById(cryptoId);
+    } catch (objectIdError) {
+      // Try to find by symbol or name if ObjectId fails
+      crypto = await Crypto.findOne({
+        $or: [
+          { symbol: cryptoId.toUpperCase() },
+          { name: { $regex: new RegExp(cryptoId, 'i') } }
+        ]
+      });
+    }
+    
+    // If still not found, try mock data
+    if (!crypto) {
+      const mockCryptos = loadMockCryptos();
+      crypto = mockCryptos.find(c => 
+        c._id === cryptoId || 
+        c.symbol.toLowerCase() === cryptoId.toLowerCase() ||
+        c.name.toLowerCase() === cryptoId.toLowerCase()
+      );
+    }
+    
     if (!crypto) {
       return res.status(404).json({ msg: 'Cryptocurrency not found' });
     }

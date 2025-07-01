@@ -48,7 +48,7 @@ export const sellInvestment = createAsyncThunk(
   'investment/sellInvestment',
   async (investmentId: string, thunkAPI) => {
     try {
-      const res = await api.delete(`/api/investments/${investmentId}`);
+      const res = await api.put(`/api/investments/${investmentId}/sell`);
       return res.data;
     } catch (err: any) {
       return thunkAPI.rejectWithValue('Failed to sell investment');
