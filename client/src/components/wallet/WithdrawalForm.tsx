@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DollarSign, AlertCircle } from 'lucide-react';
-import { requestWithdrawal } from '../../redux/thunks/walletThunks';
+import { withdraw } from '../../redux/thunks/walletThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { isValidWithdrawalAmount, validatePaymentDetails } from '../../utils/validators';
 import { formatCurrency } from '../../utils/formatters';
@@ -66,13 +66,13 @@ const WithdrawalForm: React.FC = () => {
       return;
     }
     
-    const result = await dispatch(requestWithdrawal({
+    const result = await dispatch(withdraw({
       amount: amountValue,
       paymentMethod,
       paymentDetails
     }));
     
-    if (requestWithdrawal.fulfilled.match(result)) {
+    if (withdraw.fulfilled.match(result)) {
       setAmount('');
       setSuccess(true);
     }

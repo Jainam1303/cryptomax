@@ -1,6 +1,6 @@
 // client/src/redux/slices/walletSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getWallet, getTransactions, deposit, withdraw, requestWithdrawal } from '../thunks/walletThunks';
+import { getWallet, getTransactions, deposit, withdraw } from '../thunks/walletThunks';
 
 interface WalletState {
   wallet: any;
@@ -93,28 +93,20 @@ const walletSlice = createSlice({
       })
       .addCase(withdraw.fulfilled, (state, action) => {
         state.loading = false;
-        state.wallet = action.payload.wallet;
-        state.error = null;
+        // Handle different response structures from the server
+        if (action.payload.wallet) {
+          state.wallet = action.payload.wallet;
+        } else if (action.payload.withdrawalRequest) {
+          // For withdrawal requests that don't immediately update balance
+          state.error = null;
+        }
       })
       .addCase(withdraw.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
 
-    // Request Withdrawal
-    builder
-      .addCase(requestWithdrawal.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(requestWithdrawal.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
-      })
-      .addCase(requestWithdrawal.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
+
   },
 });
 
