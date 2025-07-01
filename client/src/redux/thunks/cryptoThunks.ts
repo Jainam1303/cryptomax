@@ -45,7 +45,7 @@ export const getMarketData = createAsyncThunk(
   'crypto/getMarketData',
   async (_, thunkAPI) => {
     try {
-      const res = await api.get('/api/market-data');
+      const res = await api.get('/api/crypto/market-data');
       return res.data;
     } catch (err: any) {
       return thunkAPI.rejectWithValue('Failed to fetch market data');

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { getPortfolio } from '../../redux/thunks/investmentThunks';
-import { getWallet } from '../../redux/thunks/walletThunks';
+import { getWallet, getTransactions } from '../../redux/thunks/walletThunks';
 import { getCryptos, getMarketData } from '../../redux/thunks/cryptoThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import BalanceCard from './BalanceCard';
@@ -23,6 +23,7 @@ const Dashboard: React.FC = () => {
   
   useEffect(() => {
     dispatch(getWallet());
+    dispatch(getTransactions());
     dispatch(getPortfolio());
     dispatch(getCryptos());
     dispatch(getMarketData());

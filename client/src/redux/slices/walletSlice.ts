@@ -1,5 +1,6 @@
 // client/src/redux/slices/walletSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getWallet, getTransactions, deposit, withdraw, requestWithdrawal } from '../thunks/walletThunks';
 
 interface WalletState {
   wallet: any;
@@ -31,8 +32,91 @@ const walletSlice = createSlice({
     setWalletError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    clearWalletError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    // Get Wallet
+    builder
+      .addCase(getWallet.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getWallet.fulfilled, (state, action) => {
+        state.loading = false;
+        state.wallet = action.payload;
+        state.error = null;
+      })
+      .addCase(getWallet.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Get Transactions
+    builder
+      .addCase(getTransactions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getTransactions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.transactions = action.payload;
+        state.error = null;
+      })
+      .addCase(getTransactions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Deposit
+    builder
+      .addCase(deposit.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deposit.fulfilled, (state, action) => {
+        state.loading = false;
+        state.wallet = action.payload.wallet;
+        state.error = null;
+      })
+      .addCase(deposit.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Withdraw
+    builder
+      .addCase(withdraw.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(withdraw.fulfilled, (state, action) => {
+        state.loading = false;
+        state.wallet = action.payload.wallet;
+        state.error = null;
+      })
+      .addCase(withdraw.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Request Withdrawal
+    builder
+      .addCase(requestWithdrawal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(requestWithdrawal.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(requestWithdrawal.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 
-export const { setWallet, setTransactions, setWalletLoading, setWalletError } = walletSlice.actions;
+export const { setWallet, setTransactions, setWalletLoading, setWalletError, clearWalletError } = walletSlice.actions;
 export default walletSlice.reducer;
