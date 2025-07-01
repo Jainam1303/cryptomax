@@ -3,16 +3,22 @@ const fs = require('fs');
 const path = require('path');
 
 // Load mock data for testing when database is not available
-const loadMockCryptos = () => {
+const loadMockCryptos = (includeFullData = false) => {
   try {
     const dataPath = path.join(__dirname, '../data/cryptos.json');
     if (fs.existsSync(dataPath)) {
       const cryptos = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-      // Remove price history and admin settings for API response
-      return cryptos.map(crypto => {
-        const { priceHistory, adminSettings, ...cryptoData } = crypto;
-        return cryptoData;
-      });
+      
+      if (includeFullData) {
+        // Return full data including price history for specific crypto lookups
+        return cryptos;
+      } else {
+        // Remove price history and admin settings for API lists
+        return cryptos.map(crypto => {
+          const { priceHistory, adminSettings, ...cryptoData } = crypto;
+          return cryptoData;
+        });
+      }
     }
   } catch (error) {
     console.error('Error loading mock data:', error);
@@ -56,30 +62,54 @@ exports.getCryptos = async (req, res) => {
 exports.getCryptoById = async (req, res) => {
   try {
     let crypto;
+    let dbEmpty = false;
     
+    // First check if database has any cryptos at all
     try {
-      // Try to find by MongoDB ObjectId first
-      crypto = await Crypto.findById(req.params.id);
-    } catch (objectIdError) {
-      // If ObjectId fails, try to find by symbol or name
-      crypto = await Crypto.findOne({
-        $or: [
-          { symbol: req.params.id.toUpperCase() },
-          { name: { $regex: new RegExp(req.params.id, 'i') } },
-          { _id: req.params.id } // In case it's a string ID in mock data
-        ]
-      });
+      const cryptoCount = await Crypto.countDocuments();
+      if (cryptoCount === 0) {
+        dbEmpty = true;
+        console.log('📊 Database empty, using mock cryptocurrency data for ID lookup');
+      }
+    } catch (countError) {
+      dbEmpty = true;
+      console.log('⚠️ Database unavailable, using mock cryptocurrency data');
     }
     
-    // If still not found and we have mock data, try mock data
-    if (!crypto) {
-      console.log('🔍 Crypto not found in database, checking mock data');
-      const mockCryptos = loadMockCryptos();
+    // If database is empty or unavailable, go straight to mock data
+    if (dbEmpty) {
+      const mockCryptos = loadMockCryptos(false);
       crypto = mockCryptos.find(c => 
         c._id === req.params.id || 
         c.symbol.toLowerCase() === req.params.id.toLowerCase() ||
         c.name.toLowerCase() === req.params.id.toLowerCase()
       );
+    } else {
+      // Try database lookups
+      try {
+        // Try to find by MongoDB ObjectId first
+        crypto = await Crypto.findById(req.params.id);
+      } catch (objectIdError) {
+        // If ObjectId fails, try to find by symbol or name
+        crypto = await Crypto.findOne({
+          $or: [
+            { symbol: req.params.id.toUpperCase() },
+            { name: { $regex: new RegExp(req.params.id, 'i') } },
+            { _id: req.params.id } // In case it's a string ID in mock data
+          ]
+        });
+      }
+      
+      // If still not found in database, try mock data
+      if (!crypto) {
+        console.log('🔍 Crypto not found in database, checking mock data');
+        const mockCryptos = loadMockCryptos(false);
+        crypto = mockCryptos.find(c => 
+          c._id === req.params.id || 
+          c.symbol.toLowerCase() === req.params.id.toLowerCase() ||
+          c.name.toLowerCase() === req.params.id.toLowerCase()
+        );
+      }
     }
     
     if (!crypto) {
@@ -99,28 +129,53 @@ exports.getCryptoById = async (req, res) => {
 exports.getPriceHistory = async (req, res) => {
   try {
     let crypto;
+    let dbEmpty = false;
     
+    // First check if database has any cryptos at all
     try {
-      // Try to find by MongoDB ObjectId first
-      crypto = await Crypto.findById(req.params.id);
-    } catch (objectIdError) {
-      // If ObjectId fails, try to find by symbol or name
-      crypto = await Crypto.findOne({
-        $or: [
-          { symbol: req.params.id.toUpperCase() },
-          { name: { $regex: new RegExp(req.params.id, 'i') } }
-        ]
-      });
+      const cryptoCount = await Crypto.countDocuments();
+      if (cryptoCount === 0) {
+        dbEmpty = true;
+        console.log('📊 Database empty, using mock cryptocurrency data for price history');
+      }
+    } catch (countError) {
+      dbEmpty = true;
+      console.log('⚠️ Database unavailable, using mock cryptocurrency data for price history');
     }
     
-    // If still not found, try mock data
-    if (!crypto) {
-      const mockCryptos = loadMockCryptos();
+    // If database is empty or unavailable, go straight to mock data
+    if (dbEmpty) {
+      const mockCryptos = loadMockCryptos(true); // Need full data including price history
       crypto = mockCryptos.find(c => 
         c._id === req.params.id || 
         c.symbol.toLowerCase() === req.params.id.toLowerCase() ||
         c.name.toLowerCase() === req.params.id.toLowerCase()
       );
+    } else {
+      // Try database lookups
+      try {
+        // Try to find by MongoDB ObjectId first
+        crypto = await Crypto.findById(req.params.id);
+      } catch (objectIdError) {
+        // If ObjectId fails, try to find by symbol or name
+        crypto = await Crypto.findOne({
+          $or: [
+            { symbol: req.params.id.toUpperCase() },
+            { name: { $regex: new RegExp(req.params.id, 'i') } }
+          ]
+        });
+      }
+      
+      // If still not found in database, try mock data
+      if (!crypto) {
+        console.log('🔍 Crypto not found in database, checking mock data for price history');
+        const mockCryptos = loadMockCryptos(true); // Need full data including price history
+        crypto = mockCryptos.find(c => 
+          c._id === req.params.id || 
+          c.symbol.toLowerCase() === req.params.id.toLowerCase() ||
+          c.name.toLowerCase() === req.params.id.toLowerCase()
+        );
+      }
     }
     
     if (!crypto) {
