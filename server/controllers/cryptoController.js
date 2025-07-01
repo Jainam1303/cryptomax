@@ -1,13 +1,47 @@
 const Crypto = require('../models/Crypto');
+const fs = require('fs');
+const path = require('path');
+
+// Load mock data for testing when database is not available
+const loadMockCryptos = () => {
+  try {
+    const dataPath = path.join(__dirname, '../data/cryptos.json');
+    if (fs.existsSync(dataPath)) {
+      const cryptos = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+      // Remove price history and admin settings for API response
+      return cryptos.map(crypto => {
+        const { priceHistory, adminSettings, ...cryptoData } = crypto;
+        return cryptoData;
+      });
+    }
+  } catch (error) {
+    console.error('Error loading mock data:', error);
+  }
+  return [];
+};
 
 // @route   GET api/crypto
 // @desc    Get all cryptocurrencies
 // @access  Private
 exports.getCryptos = async (req, res) => {
   try {
-    const cryptos = await Crypto.find({ isActive: true })
-      .select('-priceHistory -adminSettings')
-      .sort({ marketCap: -1 });
+    // Try database first, fall back to mock data
+    let cryptos;
+    try {
+      cryptos = await Crypto.find({ isActive: true })
+        .select('-priceHistory -adminSettings')
+        .sort({ marketCap: -1 });
+      
+      // If database is empty, use mock data
+      if (cryptos.length === 0) {
+        console.log('📊 Database empty, using mock cryptocurrency data');
+        cryptos = loadMockCryptos();
+      }
+    } catch (dbError) {
+      // Database connection failed, use mock data
+      console.log('⚠️ Database unavailable, using mock cryptocurrency data');
+      cryptos = loadMockCryptos();
+    }
     
     res.json(cryptos);
   } catch (err) {
@@ -88,10 +122,40 @@ exports.getPriceHistory = async (req, res) => {
 // @access  Private
 exports.getMarketData = async (req, res) => {
   try {
-    const cryptos = await Crypto.find({ isActive: true })
-      .select('name symbol currentPrice priceChangePercentage24h marketCap volume24h')
-      .sort({ marketCap: -1 })
-      .limit(10);
+    let cryptos;
+    
+    try {
+      cryptos = await Crypto.find({ isActive: true })
+        .select('name symbol currentPrice priceChangePercentage24h marketCap volume24h')
+        .sort({ marketCap: -1 })
+        .limit(10);
+      
+      // If database is empty, use mock data
+      if (cryptos.length === 0) {
+        console.log('📊 Database empty, using mock market data');
+        const mockCryptos = loadMockCryptos();
+        cryptos = mockCryptos.slice(0, 10).map(crypto => ({
+          name: crypto.name,
+          symbol: crypto.symbol,
+          currentPrice: crypto.currentPrice,
+          priceChangePercentage24h: crypto.priceChangePercentage24h,
+          marketCap: crypto.marketCap,
+          volume24h: crypto.volume24h
+        }));
+      }
+    } catch (dbError) {
+      // Database connection failed, use mock data
+      console.log('⚠️ Database unavailable, using mock market data');
+      const mockCryptos = loadMockCryptos();
+      cryptos = mockCryptos.slice(0, 10).map(crypto => ({
+        name: crypto.name,
+        symbol: crypto.symbol,
+        currentPrice: crypto.currentPrice,
+        priceChangePercentage24h: crypto.priceChangePercentage24h,
+        marketCap: crypto.marketCap,
+        volume24h: crypto.volume24h
+      }));
+    }
     
     // Calculate total market cap and 24h volume
     const totalMarketCap = cryptos.reduce((sum, crypto) => sum + crypto.marketCap, 0);
