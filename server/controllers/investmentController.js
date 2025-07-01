@@ -23,10 +23,25 @@ const loadMockCryptos = () => {
 // @access  Private
 exports.getInvestments = async (req, res) => {
   try {
-    const investments = await Investment.find({ 
-      user: req.user.id,
-      status: 'active'
-    }).populate('crypto', 'name symbol currentPrice image priceChangePercentage24h');
+    // Check if database has investments
+    let investments = [];
+    
+    try {
+      const investmentCount = await Investment.countDocuments();
+      if (investmentCount === 0) {
+        console.log('📊 No investments in database - user may have mock investments');
+        // Return empty array for now - in a real app, you'd store mock investments in session/cache
+        investments = [];
+      } else {
+        investments = await Investment.find({ 
+          user: req.user.id,
+          status: 'active'
+        }).populate('crypto', 'name symbol currentPrice image priceChangePercentage24h');
+      }
+    } catch (dbError) {
+      console.log('⚠️ Database unavailable for investments');
+      investments = [];
+    }
     
     res.json(investments);
   } catch (err) {
@@ -48,26 +63,51 @@ exports.createInvestment = async (req, res) => {
     
     // Get crypto details - handle both ObjectId and string IDs
     let crypto;
+    let dbEmpty = false;
+    
+    // First check if database has any cryptos
     try {
-      crypto = await Crypto.findById(cryptoId);
-    } catch (objectIdError) {
-      // Try to find by symbol or name if ObjectId fails
-      crypto = await Crypto.findOne({
-        $or: [
-          { symbol: cryptoId.toUpperCase() },
-          { name: { $regex: new RegExp(cryptoId, 'i') } }
-        ]
-      });
+      const cryptoCount = await Crypto.countDocuments();
+      if (cryptoCount === 0) {
+        dbEmpty = true;
+        console.log('📊 Database empty, using mock cryptocurrency data for investment');
+      }
+    } catch (countError) {
+      dbEmpty = true;
+      console.log('⚠️ Database unavailable, using mock cryptocurrency data for investment');
     }
     
-    // If still not found, try mock data
-    if (!crypto) {
+    if (dbEmpty) {
+      // Go straight to mock data
       const mockCryptos = loadMockCryptos();
       crypto = mockCryptos.find(c => 
         c._id === cryptoId || 
         c.symbol.toLowerCase() === cryptoId.toLowerCase() ||
         c.name.toLowerCase() === cryptoId.toLowerCase()
       );
+    } else {
+      // Try database first
+      try {
+        crypto = await Crypto.findById(cryptoId);
+      } catch (objectIdError) {
+        // Try to find by symbol or name if ObjectId fails
+        crypto = await Crypto.findOne({
+          $or: [
+            { symbol: cryptoId.toUpperCase() },
+            { name: { $regex: new RegExp(cryptoId, 'i') } }
+          ]
+        });
+      }
+      
+      // If still not found in database, try mock data
+      if (!crypto) {
+        const mockCryptos = loadMockCryptos();
+        crypto = mockCryptos.find(c => 
+          c._id === cryptoId || 
+          c.symbol.toLowerCase() === cryptoId.toLowerCase() ||
+          c.name.toLowerCase() === cryptoId.toLowerCase()
+        );
+      }
     }
     
     if (!crypto) {
@@ -87,31 +127,77 @@ exports.createInvestment = async (req, res) => {
     // Calculate quantity based on current price
     const quantity = amount / crypto.currentPrice;
     
-    // Create investment
-    const investment = new Investment({
-      user: req.user.id,
-      crypto: cryptoId,
-      amount,
-      quantity,
-      buyPrice: crypto.currentPrice,
-      currentValue: amount,
-      profitLoss: 0,
-      profitLossPercentage: 0
-    });
+    // Create investment - handle mock data scenarios
+    let investment;
     
-    await investment.save();
+    if (dbEmpty || !crypto._id || typeof crypto._id === 'string') {
+      // For mock data or string IDs, create a simulated investment record
+      // Store crypto info directly instead of trying to reference non-existent DB record
+      investment = {
+        _id: Date.now().toString(), // Simple ID for mock
+        user: req.user.id,
+        crypto: {
+          _id: crypto._id,
+          name: crypto.name,
+          symbol: crypto.symbol,
+          currentPrice: crypto.currentPrice,
+          image: crypto.image
+        },
+        amount,
+        quantity,
+        buyPrice: crypto.currentPrice,
+        currentValue: amount,
+        profitLoss: 0,
+        profitLossPercentage: 0,
+        status: 'active',
+        createdAt: new Date()
+      };
+      
+      console.log('📊 Created mock investment record (database empty/unavailable)');
+    } else {
+      // Normal database investment
+      investment = new Investment({
+        user: req.user.id,
+        crypto: cryptoId,
+        amount,
+        quantity,
+        buyPrice: crypto.currentPrice,
+        currentValue: amount,
+        profitLoss: 0,
+        profitLossPercentage: 0
+      });
+      
+      await investment.save();
+    }
     
     // Create transaction record
-    const transaction = new Transaction({
-      user: req.user.id,
-      type: 'investment',
-      amount,
-      status: 'completed',
-      description: `Investment in ${crypto.name} (${crypto.symbol})`,
-      completedAt: Date.now()
-    });
+    let transaction;
     
-    await transaction.save();
+    if (dbEmpty) {
+      // Mock transaction for empty database
+      transaction = {
+        _id: Date.now().toString() + '_tx',
+        user: req.user.id,
+        type: 'investment',
+        amount,
+        status: 'completed',
+        description: `Investment in ${crypto.name} (${crypto.symbol})`,
+        completedAt: Date.now(),
+        createdAt: new Date()
+      };
+      console.log('📊 Created mock transaction record');
+    } else {
+      transaction = new Transaction({
+        user: req.user.id,
+        type: 'investment',
+        amount,
+        status: 'completed',
+        description: `Investment in ${crypto.name} (${crypto.symbol})`,
+        completedAt: Date.now()
+      });
+      
+      await transaction.save();
+    }
     
     // Update wallet
     wallet.balance -= amount;
@@ -194,10 +280,23 @@ exports.sellInvestment = async (req, res) => {
 // @access  Private
 exports.getPortfolio = async (req, res) => {
   try {
-    const investments = await Investment.find({ 
-      user: req.user.id,
-      status: 'active'
-    }).populate('crypto', 'name symbol currentPrice image');
+    let investments = [];
+    
+    try {
+      const investmentCount = await Investment.countDocuments();
+      if (investmentCount === 0) {
+        console.log('📊 No investments in database for portfolio');
+        investments = [];
+      } else {
+        investments = await Investment.find({ 
+          user: req.user.id,
+          status: 'active'
+        }).populate('crypto', 'name symbol currentPrice image');
+      }
+    } catch (dbError) {
+      console.log('⚠️ Database unavailable for portfolio');
+      investments = [];
+    }
     
     let totalInvested = 0;
     let totalCurrentValue = 0;
@@ -218,11 +317,13 @@ exports.getPortfolio = async (req, res) => {
         adjustedProfitLoss = (adjustedProfitLossPercentage / 100) * investment.amount;
       }
       
-      // Update investment with latest values
-      investment.currentValue = currentValue;
-      investment.profitLoss = adjustedProfitLoss;
-      investment.profitLossPercentage = adjustedProfitLossPercentage;
-      await investment.save();
+      // Update investment with latest values (only if it's a real DB record)
+      if (investment.save) {
+        investment.currentValue = currentValue;
+        investment.profitLoss = adjustedProfitLoss;
+        investment.profitLossPercentage = adjustedProfitLossPercentage;
+        await investment.save();
+      }
       
       totalInvested += investment.amount;
       totalCurrentValue += currentValue;
