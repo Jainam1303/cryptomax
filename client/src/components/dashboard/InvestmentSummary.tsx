@@ -82,7 +82,7 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ portfolio }) => {
             Invest More
           </Button>
         </Link>
-        <Link to="/dashboard/portfolio">
+                    <Link to="/portfolio">
           <Button
             variant="outline"
             fullWidth

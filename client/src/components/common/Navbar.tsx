@@ -37,6 +37,7 @@ const Navbar: React.FC = () => {
               <div className="hidden sm:ml-6 sm:flex sm:space-x-4">
                 <NavLink to="/dashboard" currentPath={location.pathname}>Dashboard</NavLink>
                 <NavLink to="/invest" currentPath={location.pathname}>Invest</NavLink>
+                <NavLink to="/portfolio" currentPath={location.pathname}>Portfolio</NavLink>
                 <NavLink to="/wallet" currentPath={location.pathname}>Wallet</NavLink>
                 {user?.role === 'admin' && (
                   <NavLink to="/admin" currentPath={location.pathname}>Admin</NavLink>
@@ -128,6 +129,7 @@ const Navbar: React.FC = () => {
               <>
                 <MobileNavLink to="/dashboard" currentPath={location.pathname} onClick={closeMenus}>Dashboard</MobileNavLink>
                 <MobileNavLink to="/invest" currentPath={location.pathname} onClick={closeMenus}>Invest</MobileNavLink>
+                <MobileNavLink to="/portfolio" currentPath={location.pathname} onClick={closeMenus}>Portfolio</MobileNavLink>
                 <MobileNavLink to="/wallet" currentPath={location.pathname} onClick={closeMenus}>Wallet</MobileNavLink>
                 <MobileNavLink to="/profile" currentPath={location.pathname} onClick={closeMenus}>Profile</MobileNavLink>
                 {user?.role === 'admin' && (
