@@ -31,7 +31,7 @@ export const login = createAsyncThunk(
 
       return res.data;
     } catch (err: any) {
-      return thunkAPI.rejectWithValue(err.response?.data?.message || 'Login failed');
+      return thunkAPI.rejectWithValue(err.response?.data?.msg || err.response?.data?.message || 'Login failed');
     }
   }
 );
@@ -56,7 +56,7 @@ export const register = createAsyncThunk(
 
       return res.data;
     } catch (err: any) {
-      return thunkAPI.rejectWithValue(err.response?.data?.message || 'Register failed');
+      return thunkAPI.rejectWithValue(err.response?.data?.msg || err.response?.data?.message || 'Register failed');
     }
   }
 );
@@ -81,7 +81,7 @@ export const updateProfile = createAsyncThunk(
       return res.data;
     } catch (err: any) {
       return thunkAPI.rejectWithValue(
-        err.response?.data?.message || 'Failed to update profile'
+        err.response?.data?.msg || err.response?.data?.message || 'Failed to update profile'
       );
     }
   }

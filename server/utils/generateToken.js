@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const config = require('config');
 
 const generateToken = (userId) => {
   const payload = {
@@ -8,10 +7,13 @@ const generateToken = (userId) => {
     }
   };
 
+  const jwtSecret = process.env.JWT_SECRET || 'super_secure_12345';
+  const jwtExpiration = process.env.JWT_EXPIRATION || '24h';
+
   return jwt.sign(
     payload,
-    config.get('jwtSecret'),
-    { expiresIn: config.get('jwtExpiration') }
+    jwtSecret,
+    { expiresIn: jwtExpiration }
   );
 };
 

@@ -7,13 +7,8 @@ const WithdrawalRequest = require('../models/WithdrawalRequest');
 // @access  Private
 exports.getWallet = async (req, res) => {
   try {
-    const wallet = await Wallet.findOne({ user: req.user.id });
-    
-    if (!wallet) {
-      return res.status(404).json({ msg: 'Wallet not found' });
-    }
-    
-    res.json(wallet);
+    // Wallet is ensured by middleware and attached to req.wallet
+    res.json(req.wallet);
   } catch (err) {
     console.error('Get wallet error:', err.message);
     res.status(500).json({ msg: 'Server error' });
@@ -31,11 +26,8 @@ exports.deposit = async (req, res) => {
       return res.status(400).json({ msg: 'Amount must be greater than 0' });
     }
     
-    const wallet = await Wallet.findOne({ user: req.user.id });
-    
-    if (!wallet) {
-      return res.status(404).json({ msg: 'Wallet not found' });
-    }
+    // Use wallet from middleware
+    const wallet = req.wallet;
     
     // In a real app, you would integrate with a payment processor here
     // For this demo, we'll simulate an instant deposit
@@ -79,11 +71,8 @@ exports.requestWithdrawal = async (req, res) => {
       return res.status(400).json({ msg: 'Amount must be greater than 0' });
     }
     
-    const wallet = await Wallet.findOne({ user: req.user.id });
-    
-    if (!wallet) {
-      return res.status(404).json({ msg: 'Wallet not found' });
-    }
+    // Use wallet from middleware
+    const wallet = req.wallet;
     
     if (wallet.balance < amount) {
       return res.status(400).json({ msg: 'Insufficient funds' });

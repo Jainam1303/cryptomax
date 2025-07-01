@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const auth = require('../../middleware/auth');
+const ensureWallet = require('../../middleware/ensureWallet');
 const investmentController = require('../../controllers/investmentController');
 
 // @route   GET api/investments
@@ -16,6 +17,7 @@ router.post(
   '/',
   [
     auth,
+    ensureWallet,
     check('cryptoId', 'Cryptocurrency ID is required').not().isEmpty(),
     check('amount', 'Amount is required and must be greater than 0').isFloat({ min: 0.01 })
   ],
