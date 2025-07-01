@@ -5,6 +5,13 @@ const Transaction = require('../models/Transaction');
 const fs = require('fs');
 const path = require('path');
 
+const { 
+  storeMockInvestment, 
+  storeMockTransaction, 
+  getMockInvestments, 
+  getMockTransactions 
+} = require('../utils/mockDataManager');
+
 // Load mock crypto data when database is unavailable
 const loadMockCryptos = () => {
   try {
@@ -29,9 +36,9 @@ exports.getInvestments = async (req, res) => {
     try {
       const investmentCount = await Investment.countDocuments();
       if (investmentCount === 0) {
-        console.log('📊 No investments in database - user may have mock investments');
-        // Return empty array for now - in a real app, you'd store mock investments in session/cache
-        investments = [];
+        console.log('📊 No investments in database - checking mock investments');
+        // Get mock investments for this user
+        investments = getMockInvestments(req.user.id);
       } else {
         investments = await Investment.find({ 
           user: req.user.id,
@@ -39,8 +46,8 @@ exports.getInvestments = async (req, res) => {
         }).populate('crypto', 'name symbol currentPrice image priceChangePercentage24h');
       }
     } catch (dbError) {
-      console.log('⚠️ Database unavailable for investments');
-      investments = [];
+      console.log('⚠️ Database unavailable - checking mock investments');
+      investments = getMockInvestments(req.user.id);
     }
     
     res.json(investments);
@@ -153,6 +160,8 @@ exports.createInvestment = async (req, res) => {
         createdAt: new Date()
       };
       
+      // Store the mock investment
+      storeMockInvestment(req.user.id, investment);
       console.log('📊 Created mock investment record (database empty/unavailable)');
     } else {
       // Normal database investment
@@ -185,6 +194,8 @@ exports.createInvestment = async (req, res) => {
         completedAt: Date.now(),
         createdAt: new Date()
       };
+      // Store the mock transaction
+      storeMockTransaction(req.user.id, transaction);
       console.log('📊 Created mock transaction record');
     } else {
       transaction = new Transaction({
@@ -285,8 +296,8 @@ exports.getPortfolio = async (req, res) => {
     try {
       const investmentCount = await Investment.countDocuments();
       if (investmentCount === 0) {
-        console.log('📊 No investments in database for portfolio');
-        investments = [];
+        console.log('📊 No investments in database - checking mock investments for portfolio');
+        investments = getMockInvestments(req.user.id);
       } else {
         investments = await Investment.find({ 
           user: req.user.id,
@@ -294,8 +305,8 @@ exports.getPortfolio = async (req, res) => {
         }).populate('crypto', 'name symbol currentPrice image');
       }
     } catch (dbError) {
-      console.log('⚠️ Database unavailable for portfolio');
-      investments = [];
+      console.log('⚠️ Database unavailable - checking mock investments for portfolio');
+      investments = getMockInvestments(req.user.id);
     }
     
     let totalInvested = 0;
@@ -304,7 +315,21 @@ exports.getPortfolio = async (req, res) => {
     
     // Update current values based on latest prices
     const updatedInvestments = await Promise.all(investments.map(async (investment) => {
-      const currentValue = investment.quantity * investment.crypto.currentPrice;
+      // Get current crypto price (for mock investments, use the stored crypto data)
+      let currentPrice = investment.crypto.currentPrice;
+      
+      // For mock investments, try to get updated price from mock data
+      if (!investment.save && investment.crypto._id) {
+        const mockCryptos = loadMockCryptos();
+        const updatedCrypto = mockCryptos.find(c => c._id === investment.crypto._id);
+        if (updatedCrypto) {
+          currentPrice = updatedCrypto.currentPrice;
+          // Update the crypto data in the investment
+          investment.crypto.currentPrice = currentPrice;
+        }
+      }
+      
+      const currentValue = investment.quantity * currentPrice;
       const profitLoss = currentValue - investment.amount;
       const profitLossPercentage = (profitLoss / investment.amount) * 100;
       
@@ -317,11 +342,13 @@ exports.getPortfolio = async (req, res) => {
         adjustedProfitLoss = (adjustedProfitLossPercentage / 100) * investment.amount;
       }
       
-      // Update investment with latest values (only if it's a real DB record)
+      // Update investment with latest values
+      investment.currentValue = currentValue;
+      investment.profitLoss = adjustedProfitLoss;
+      investment.profitLossPercentage = adjustedProfitLossPercentage;
+      
+      // Save only if it's a real DB record
       if (investment.save) {
-        investment.currentValue = currentValue;
-        investment.profitLoss = adjustedProfitLoss;
-        investment.profitLossPercentage = adjustedProfitLossPercentage;
         await investment.save();
       }
       

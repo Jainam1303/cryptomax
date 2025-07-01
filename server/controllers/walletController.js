@@ -1,6 +1,7 @@
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
 const WithdrawalRequest = require('../models/WithdrawalRequest');
+const { getMockTransactions } = require('../utils/mockDataManager');
 
 // @route   GET api/wallet
 // @desc    Get user wallet
@@ -120,8 +121,21 @@ exports.requestWithdrawal = async (req, res) => {
 // @access  Private
 exports.getTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.find({ user: req.user.id })
-      .sort({ createdAt: -1 });
+    let transactions = [];
+    
+    try {
+      const transactionCount = await Transaction.countDocuments();
+      if (transactionCount === 0) {
+        console.log('📊 No transactions in database - checking mock transactions');
+        transactions = getMockTransactions(req.user.id);
+      } else {
+        transactions = await Transaction.find({ user: req.user.id })
+          .sort({ createdAt: -1 });
+      }
+    } catch (dbError) {
+      console.log('⚠️ Database unavailable - checking mock transactions');
+      transactions = getMockTransactions(req.user.id);
+    }
     
     res.json(transactions);
   } catch (err) {
