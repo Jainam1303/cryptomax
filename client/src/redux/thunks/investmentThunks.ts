@@ -29,3 +29,29 @@ export const createInvestment = createAsyncThunk(
     }
   }
 );
+
+// ✅ Get user's investments
+export const getInvestments = createAsyncThunk(
+  'investment/getInvestments',
+  async (_, thunkAPI) => {
+    try {
+      const res = await api.get('/api/investments');
+      return res.data;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue('Failed to load investments');
+    }
+  }
+);
+
+// ✅ Sell an investment
+export const sellInvestment = createAsyncThunk(
+  'investment/sellInvestment',
+  async (investmentId: string, thunkAPI) => {
+    try {
+      const res = await api.delete(`/api/investments/${investmentId}`);
+      return res.data;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue('Failed to sell investment');
+    }
+  }
+);

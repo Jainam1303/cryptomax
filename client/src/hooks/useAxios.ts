@@ -65,7 +65,7 @@ const useAxios = <T>({
         }
       } catch (err) {
         const error = err as AxiosError;
-        const errorMessage = error.response?.data?.msg || 'An error occurred';
+        const errorMessage = (error.response?.data as any)?.msg || error.message || 'An error occurred';
         setError(errorMessage);
         
         if (onError) {
