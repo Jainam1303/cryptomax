@@ -4,7 +4,7 @@ import { Users, DollarSign, TrendingUp, Clock } from 'lucide-react';
 import { getDashboardData } from '../../redux/thunks/adminThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency } from '../../utils/formatters';
-import Card from '../ui/Card';
+import { Card, CardHeader, CardContent, CardTitle } from '../ui/card';
 import Spinner from '../ui/Spinner';
 import { Transaction } from '../../types';
 
