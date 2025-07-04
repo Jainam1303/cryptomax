@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateProfile } from '../redux/thunks/authThunks';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
 import Input from '../components/ui/Input';
 import Alert from '../components/ui/Alert';
 import Sidebar from '../components/common/Sidebar';
@@ -245,13 +245,14 @@ const ProfilePage: React.FC = () => {
                 </div>
                 
                 <div className="flex justify-end">
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    isLoading={loading}
-                  >
-                    Save Changes
-                  </Button>
+                                      <Button
+                      type="submit"
+                      variant="default"
+                      disabled={loading}
+                      className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50"
+                    >
+                      {loading ? 'Saving...' : 'Save Changes'}
+                    </Button>
                 </div>
               </div>
             </form>

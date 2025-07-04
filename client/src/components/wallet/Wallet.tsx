@@ -5,8 +5,8 @@ import { Wallet as WalletIcon, ArrowUpRight, ArrowDownRight, Clock } from 'lucid
 import { getWallet } from '../../redux/thunks/walletThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency } from '../../utils/formatters';
-import Card from '../ui/Card';
-import Button from '../ui/Button';
+import { Card, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
 import Spinner from '../ui/Spinner';
 import DepositForm from './DepositForm';
 import WithdrawalForm from './WithdrawalForm';
@@ -142,18 +142,20 @@ const Wallet: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
-              variant="primary"
-              leftIcon={<ArrowUpRight className="h-4 w-4" />}
+              variant="default"
               onClick={() => setActiveTab('deposit')}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
             >
+              <ArrowUpRight className="h-4 w-4 mr-2" />
               Deposit Funds
             </Button>
             <Button
               variant="outline"
-              leftIcon={<ArrowDownRight className="h-4 w-4" />}
               onClick={() => setActiveTab('withdraw')}
               disabled={wallet.balance <= 0}
+              className="border-white/20 text-white hover:bg-white/10"
             >
+              <ArrowDownRight className="h-4 w-4 mr-2" />
               Withdraw Funds
             </Button>
           </div>

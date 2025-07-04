@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
 import { login } from '../redux/thunks/authThunks';
 import { RootState, AppDispatch } from '../redux/store';
+import { Button } from '../components/ui/button';
 
 const LoginPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -114,20 +115,20 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2"
+              className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300"
             >
               {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>
               ) : (
                 <>
-                  <LogIn className="h-5 w-5" />
+                  <LogIn className="h-5 w-5 mr-2" />
                   <span>Sign In</span>
                 </>
               )}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-8 text-center">

@@ -5,7 +5,7 @@ import { deposit } from '../../redux/thunks/walletThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { isValidAmount } from '../../utils/validators';
 import Input from '../ui/Input';
-import Button from '../ui/Button';
+import { Button } from '../ui/button';
 import Alert from '../ui/Alert';
 
 const DepositForm: React.FC = () => {
@@ -64,11 +64,12 @@ const DepositForm: React.FC = () => {
         />
         
         <Button
-          variant="primary"
+          variant="default"
           onClick={() => {
             setSuccess(false);
             setAmount('');
           }}
+          className="bg-purple-600 hover:bg-purple-700 text-white"
         >
           Make Another Deposit
         </Button>
@@ -181,11 +182,11 @@ const DepositForm: React.FC = () => {
         
         <Button
           type="submit"
-          variant="primary"
-          isLoading={loading}
-          disabled={!amount || !isValidAmount(amount) || parseFloat(amount) < 10}
+          variant="default"
+          disabled={!amount || !isValidAmount(amount) || parseFloat(amount) < 10 || loading}
+          className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50"
         >
-          Deposit Funds
+          {loading ? 'Processing...' : 'Deposit Funds'}
         </Button>
       </form>
     </div>
