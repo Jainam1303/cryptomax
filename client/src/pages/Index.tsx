@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import { TrendingUp, Shield, Zap, BarChart3, Wallet, Users, ArrowRight, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
