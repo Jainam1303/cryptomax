@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
-import { ArrowRight, TrendingUp, Shield, Zap, BarChart3, Users, Award } from 'lucide-react';
+import { ArrowRight, TrendingUp, Shield, Zap, BarChart3, Wallet, Users } from 'lucide-react';
 
 const HomePage: React.FC = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -10,40 +10,48 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8">
-              Welcome to{' '}
-              <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                CryptoMax
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              Maximize Your
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+                {" "}
+                Crypto{" "}
               </span>
+              Potential
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-              The most advanced cryptocurrency investment platform. Trade, invest, and grow your portfolio with confidence.
+            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+              Advanced cryptocurrency tracking, portfolio management, and investment insights. Take control of your
+              digital assets with professional-grade tools.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {isAuthenticated ? (
-                <Link
-                  to="/dashboard"
-                  className="group bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 flex items-center space-x-2 shadow-2xl hover:shadow-purple-500/25"
-                >
-                  <span>Go to Dashboard</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-300 inline-flex items-center justify-center"
+                  >
+                    View Dashboard <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                  <Link
+                    to="/invest"
+                    className="border border-white/20 text-white hover:bg-white/10 px-8 py-3 bg-transparent rounded-lg text-lg font-semibold transition-all duration-300 inline-flex items-center justify-center"
+                  >
+                    Start Trading
+                  </Link>
+                </>
               ) : (
                 <>
                   <Link
                     to="/register"
-                    className="group bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 flex items-center space-x-2 shadow-2xl hover:shadow-purple-500/25"
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-300 inline-flex items-center justify-center"
                   >
-                    <span>Start Trading</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    Start Trading <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                   <Link
                     to="/login"
-                    className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-white/20 transition-all duration-300"
+                    className="border border-white/20 text-white hover:bg-white/10 px-8 py-3 bg-transparent rounded-lg text-lg font-semibold transition-all duration-300 inline-flex items-center justify-center"
                   >
                     Sign In
                   </Link>
@@ -52,101 +60,212 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Floating Cards */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 animate-pulse">
+            <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">₿</span>
+                </div>
+                <div>
+                  <p className="text-white text-sm font-medium">Bitcoin</p>
+                  <p className="text-green-400 text-xs">+5.2%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute top-40 right-10 animate-pulse" style={{ animationDelay: '1000ms' }}>
+            <div className="bg-black/40 border border-blue-500/20 backdrop-blur-sm rounded-lg p-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">Ξ</span>
+                </div>
+                <div>
+                  <p className="text-white text-sm font-medium">Ethereum</p>
+                  <p className="text-green-400 text-xs">+3.8%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 relative">
+      <section id="features" className="py-24 bg-black/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Why Choose CryptoMax?
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Powerful Features for Crypto Traders</h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Experience the future of cryptocurrency trading with our cutting-edge platform
+              Everything you need to track, analyze, and optimize your cryptocurrency investments
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard
-              icon={<TrendingUp className="w-8 h-8" />}
-              title="Advanced Analytics"
-              description="Real-time market data, technical indicators, and comprehensive portfolio analytics to make informed decisions."
-              gradient="from-green-500 to-emerald-500"
+              icon={<BarChart3 className="h-6 w-6 text-white" />}
+              title="Real-time Analytics"
+              description="Advanced charts and analytics to track your portfolio performance in real-time"
+              iconBg="bg-purple-600"
             />
+
             <FeatureCard
-              icon={<Shield className="w-8 h-8" />}
-              title="Bank-Level Security"
-              description="Industry-leading security measures including 2FA, cold storage, and insurance protection for your assets."
-              gradient="from-blue-500 to-cyan-500"
-            />
-            <FeatureCard
-              icon={<Zap className="w-8 h-8" />}
-              title="Lightning Fast"
-              description="Ultra-fast order execution and instant deposits/withdrawals. Never miss a trading opportunity again."
-              gradient="from-yellow-500 to-orange-500"
-            />
-            <FeatureCard
-              icon={<BarChart3 className="w-8 h-8" />}
+              icon={<Wallet className="h-6 w-6 text-white" />}
               title="Portfolio Management"
-              description="Advanced portfolio tracking, rebalancing tools, and performance analytics to optimize your investments."
-              gradient="from-purple-500 to-pink-500"
+              description="Comprehensive portfolio tracking with detailed insights and performance metrics"
+              iconBg="bg-blue-600"
             />
+
             <FeatureCard
-              icon={<Users className="w-8 h-8" />}
-              title="24/7 Support"
-              description="Round-the-clock customer support from our team of crypto experts. We're here when you need us."
-              gradient="from-indigo-500 to-blue-500"
+              icon={<TrendingUp className="h-6 w-6 text-white" />}
+              title="Smart Alerts"
+              description="Get notified about price movements, market trends, and investment opportunities"
+              iconBg="bg-green-600"
             />
+
             <FeatureCard
-              icon={<Award className="w-8 h-8" />}
-              title="Award Winning"
-              description="Recognized as the #1 crypto platform for innovation, security, and user experience."
-              gradient="from-red-500 to-pink-500"
+              icon={<Shield className="h-6 w-6 text-white" />}
+              title="Secure Trading"
+              description="Bank-level security with encrypted transactions and secure wallet integration"
+              iconBg="bg-orange-600"
+            />
+
+            <FeatureCard
+              icon={<Zap className="h-6 w-6 text-white" />}
+              title="Lightning Fast"
+              description="Execute trades in milliseconds with our optimized trading engine"
+              iconBg="bg-red-600"
+            />
+
+            <FeatureCard
+              icon={<Users className="h-6 w-6 text-white" />}
+              title="Community Insights"
+              description="Learn from experienced traders and share insights with the community"
+              iconBg="bg-pink-600"
             />
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-black/20 backdrop-blur-sm">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Trusted by Millions
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <StatCard number="2M+" label="Active Users" />
-            <StatCard number="$50B+" label="Trading Volume" />
-            <StatCard number="99.9%" label="Uptime" />
-            <StatCard number="150+" label="Cryptocurrencies" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold text-white mb-2">$2.5B+</div>
+              <div className="text-gray-300">Total Volume Traded</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-white mb-2">150K+</div>
+              <div className="text-gray-300">Active Users</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-white mb-2">500+</div>
+              <div className="text-gray-300">Supported Coins</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-white mb-2">99.9%</div>
+              <div className="text-gray-300">Uptime</div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 backdrop-blur-sm border border-white/10 rounded-3xl p-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to Start Your Crypto Journey?
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Join millions of users who trust CryptoMax for their cryptocurrency investments
-            </p>
-            {!isAuthenticated && (
-              <Link
-                to="/register"
-                className="group bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 inline-flex items-center space-x-2 shadow-2xl hover:shadow-purple-500/25"
-              >
-                <span>Get Started Today</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            )}
-          </div>
+      <section className="py-24 bg-gradient-to-r from-purple-600 to-pink-600">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Maximize Your Crypto Portfolio?</h2>
+          <p className="text-xl text-purple-100 mb-8">
+            Join thousands of traders who trust CryptoMax for their cryptocurrency investments
+          </p>
+          {!isAuthenticated && (
+            <Link
+              to="/register"
+              className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-300 inline-flex items-center justify-center"
+            >
+              Get Started Today <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          )}
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-black/40 border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-white font-bold text-lg mb-4">CryptoMax</h3>
+              <p className="text-gray-300 text-sm">
+                The ultimate platform for cryptocurrency trading and portfolio management.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li>
+                  <a href="#features" className="hover:text-white transition-colors">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <Link to="/invest" className="hover:text-white transition-colors">
+                    Invest
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/portfolio" className="hover:text-white transition-colors">
+                    Portfolio
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li>
+                  <a href="#about" className="hover:text-white transition-colors">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Careers
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Contact
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Status
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-300 text-sm">
+            <p>&copy; 2024 CryptoMax. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
@@ -155,31 +274,17 @@ interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  gradient: string;
+  iconBg: string;
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, gradient }) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, iconBg }) => {
   return (
-    <div className="group bg-black/40 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-black/60 transition-all duration-300 hover:scale-105">
-      <div className={`w-16 h-16 bg-gradient-to-r ${gradient} rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-300`}>
+    <div className="bg-black/40 border border-white/10 backdrop-blur-sm hover:border-purple-500/50 transition-colors rounded-lg p-6">
+      <div className={`w-12 h-12 ${iconBg} rounded-lg flex items-center justify-center mb-4`}>
         {icon}
       </div>
-      <h3 className="text-xl font-semibold text-white mb-4">{title}</h3>
+      <h3 className="text-white text-xl font-semibold mb-4">{title}</h3>
       <p className="text-gray-300 leading-relaxed">{description}</p>
-    </div>
-  );
-};
-
-interface StatCardProps {
-  number: string;
-  label: string;
-}
-
-const StatCard: React.FC<StatCardProps> = ({ number, label }) => {
-  return (
-    <div className="text-center">
-      <div className="text-4xl md:text-5xl font-bold text-white mb-2">{number}</div>
-      <div className="text-gray-300 text-lg">{label}</div>
     </div>
   );
 };
