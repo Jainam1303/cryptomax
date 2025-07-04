@@ -4,7 +4,7 @@ import { ArrowUpRight, ArrowDownRight, TrendingUp, AlertCircle } from 'lucide-re
 import { getTransactions } from '../../redux/thunks/walletThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency, formatDate } from '../../utils/formatters';
-import Card from '../ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import Spinner from '../ui/Spinner';
 import Badge from '../ui/Badge';
 

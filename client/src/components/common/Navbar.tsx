@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Wallet, LogOut, User, Menu, X } from 'lucide-react';
+import { Wallet, LogOut, Menu, X } from 'lucide-react';
 import { RootState } from '../../redux/store';
 import { logout } from '../../redux/slices/authSlice';
 import { useState } from 'react';
@@ -20,6 +20,11 @@ const Navbar: React.FC = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  // Don't show navbar on home page since it has its own navigation
+  if (window.location.pathname === '/') {
+    return null;
+  }
 
   return (
     <nav className="bg-black/20 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50">
