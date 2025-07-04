@@ -1,253 +1,206 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import {
-  TrendingUp,
-  Wallet,
-  BarChart3,
-  PieChart,
-  Settings,
-  Bell,
-  Search,
-  Filter,
-  Plus,
-  ArrowUpRight,
-  ArrowDownRight,
-} from "lucide-react";
-import { RootState, AppDispatch } from '../redux/store';
-import { getWallet } from '../redux/thunks/walletThunks';
-import { getPortfolio } from '../redux/thunks/investmentThunks';
-import { getCryptos } from '../redux/thunks/cryptoThunks';
 
-const DashboardPage: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { wallet } = useSelector((state: RootState) => state.wallet);
-  const { portfolio } = useSelector((state: RootState) => state.investment);
-  const { cryptos } = useSelector((state: RootState) => state.crypto);
-  const [selectedTab, setSelectedTab] = useState("overview");
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, TrendingDown, Wallet, PieChart, BarChart3, ArrowUpRight, ArrowDownRight, Plus } from "lucide-react";
 
-  useEffect(() => {
-    dispatch(getWallet());
-    dispatch(getPortfolio());
-    dispatch(getCryptos());
-  }, [dispatch]);
+const DashboardPage = () => {
+  const portfolioData = {
+    totalValue: 125750.42,
+    dayChange: 2847.23,
+    dayChangePercent: 2.31,
+    totalInvested: 120000,
+    totalProfit: 5750.42,
+    profitPercent: 4.79
+  };
 
-  // Mock data for demonstration - replace with real data from your store
-  const cryptoData = portfolio?.investments?.map((investment: any) => ({
-    name: investment.crypto.name,
-    symbol: investment.crypto.symbol,
-    price: investment.crypto.currentPrice,
-    change: investment.profitLossPercentage,
-    amount: investment.quantity,
-    value: investment.currentValue,
-    color: getColorForCrypto(investment.crypto.symbol)
-  })) || [
-    { name: "Bitcoin", symbol: "BTC", price: 43250.0, change: 5.2, amount: 0.5, value: 21625.0, color: "bg-orange-500" },
-    { name: "Ethereum", symbol: "ETH", price: 2650.0, change: 3.8, amount: 8.2, value: 21730.0, color: "bg-blue-500" },
-    { name: "Cardano", symbol: "ADA", price: 0.45, change: -2.1, amount: 15000, value: 6750.0, color: "bg-green-500" },
-    { name: "Solana", symbol: "SOL", price: 98.5, change: 7.3, amount: 45, value: 4432.5, color: "bg-purple-500" },
-    { name: "Polygon", symbol: "MATIC", price: 0.85, change: -1.5, amount: 5000, value: 4250.0, color: "bg-indigo-500" },
+  const holdings = [
+    { name: "Bitcoin", symbol: "BTC", amount: 2.5, value: 108750, allocation: 86.4, change: 2.45, positive: true },
+    { name: "Ethereum", symbol: "ETH", amount: 7.2, value: 12500, allocation: 9.9, change: 1.23, positive: true },
+    { name: "Solana", symbol: "SOL", amount: 45.8, value: 3200, allocation: 2.5, change: -0.87, positive: false },
+    { name: "Cardano", symbol: "ADA", amount: 2800, value: 1300.42, allocation: 1.0, change: 3.21, positive: true }
   ];
 
-  const totalValue = portfolio?.summary?.totalCurrentValue || cryptoData.reduce((sum: number, crypto: any) => sum + crypto.value, 0);
-  const totalChange = portfolio?.summary?.totalProfitLossPercentage || 5.2;
-  const totalChangeAmount = portfolio?.summary?.totalProfitLoss || 2847;
-
-  function getColorForCrypto(symbol: string): string {
-    const colors: { [key: string]: string } = {
-      BTC: "bg-orange-500",
-      ETH: "bg-blue-500",
-      ADA: "bg-green-500",
-      SOL: "bg-purple-500",
-      MATIC: "bg-indigo-500",
-      BNB: "bg-yellow-500",
-    };
-    return colors[symbol] || "bg-gray-500";
-  }
-
-  const bestPerformer = cryptoData.reduce((best: any, crypto: any) => 
-    crypto.change > best.change ? crypto : best, cryptoData[0] || { change: 0, symbol: "N/A" });
+  const recentTransactions = [
+    { type: "buy", asset: "BTC", amount: 0.5, value: 21625, time: "2 hours ago" },
+    { type: "sell", asset: "ETH", amount: 1.2, value: 2856, time: "1 day ago" },
+    { type: "buy", asset: "SOL", amount: 15.0, value: 1477.5, time: "2 days ago" },
+    { type: "deposit", asset: "USD", amount: 5000, value: 5000, time: "3 days ago" }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Header */}
-      <header className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
-        <div className="flex h-16 items-center px-6">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-white">CryptoMax</h1>
-            <div className="bg-purple-600/20 text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
-              Dashboard
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Navigation */}
+      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">CM</span>
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                CryptoMax
+              </span>
             </div>
-          </div>
-
-          <div className="ml-auto flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                placeholder="Search cryptocurrencies..."
-                className="w-64 pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
+            
+            <div className="flex items-center space-x-4">
+              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Invest Now
+              </Button>
+              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
-            <button className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
-              <Bell className="h-5 w-5" />
-            </button>
-            <button className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
-              <Settings className="h-5 w-5" />
-            </button>
           </div>
         </div>
-      </header>
+      </nav>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 border-r border-white/10 bg-black/20 backdrop-blur-sm">
-          <nav className="p-6">
-            <ul className="space-y-2">
-              <li>
-                <button className="w-full flex items-center justify-start px-4 py-2 text-white bg-white/10 rounded-lg">
-                  <BarChart3 className="mr-3 h-4 w-4" />
-                  Overview
-                </button>
-              </li>
-              <li>
-                <Link to="/portfolio" className="w-full flex items-center justify-start px-4 py-2 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors">
-                  <Wallet className="mr-3 h-4 w-4" />
-                  Portfolio
-                </Link>
-              </li>
-              <li>
-                <Link to="/invest" className="w-full flex items-center justify-start px-4 py-2 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors">
-                  <PieChart className="mr-3 h-4 w-4" />
-                  Invest
-                </Link>
-              </li>
-              <li>
-                <Link to="/wallet" className="w-full flex items-center justify-start px-4 py-2 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors">
-                  <TrendingUp className="mr-3 h-4 w-4" />
-                  Wallet
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        </aside>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+          <p className="text-gray-600">Welcome back! Here's your portfolio overview.</p>
+        </div>
 
-        {/* Main Content */}
-        <main className="flex-1 p-6">
-          {/* Portfolio Summary */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-3xl font-bold text-white">Portfolio Overview</h2>
-                <p className="text-gray-300">Track your cryptocurrency investments</p>
+        {/* Portfolio Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Portfolio</CardTitle>
+              <Wallet className="h-4 w-4 text-gray-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900">
+                ${portfolioData.totalValue.toLocaleString()}
               </div>
-              <Link to="/invest" className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Asset
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="bg-black/40 border border-white/10 backdrop-blur-sm rounded-lg p-6">
-                <div className="text-sm font-medium text-gray-300 mb-2">Total Value</div>
-                <div className="text-2xl font-bold text-white">${totalValue.toLocaleString()}</div>
-                <div className={`flex items-center text-sm ${totalChange >= 0 ? "text-green-400" : "text-red-400"}`}>
-                  {totalChange >= 0 ? (
-                    <ArrowUpRight className="h-4 w-4 mr-1" />
-                  ) : (
-                    <ArrowDownRight className="h-4 w-4 mr-1" />
-                  )}
-                  {Math.abs(totalChange).toFixed(2)}%
-                </div>
+              <div className={`flex items-center text-sm mt-1 ${portfolioData.dayChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {portfolioData.dayChange > 0 ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
+                ${Math.abs(portfolioData.dayChange).toLocaleString()} ({portfolioData.dayChangePercent}%)
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="bg-black/40 border border-white/10 backdrop-blur-sm rounded-lg p-6">
-                <div className="text-sm font-medium text-gray-300 mb-2">24h Change</div>
-                <div className="text-2xl font-bold text-green-400">
-                  {totalChangeAmount >= 0 ? '+' : ''}${Math.abs(totalChangeAmount).toLocaleString()}
-                </div>
-                <div className="flex items-center text-sm text-green-400">
-                  <ArrowUpRight className="h-4 w-4 mr-1" />
-                  {Math.abs(totalChange).toFixed(1)}%
-                </div>
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Invested</CardTitle>
+              <TrendingUp className="h-4 w-4 text-gray-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900">
+                ${portfolioData.totalInvested.toLocaleString()}
               </div>
+              <p className="text-xs text-gray-600 mt-1">Initial investment</p>
+            </CardContent>
+          </Card>
 
-              <div className="bg-black/40 border border-white/10 backdrop-blur-sm rounded-lg p-6">
-                <div className="text-sm font-medium text-gray-300 mb-2">Best Performer</div>
-                <div className="text-2xl font-bold text-white">{bestPerformer.symbol}</div>
-                <div className="flex items-center text-sm text-green-400">
-                  <ArrowUpRight className="h-4 w-4 mr-1" />
-                  {bestPerformer.change.toFixed(1)}%
-                </div>
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Profit</CardTitle>
+              <PieChart className="h-4 w-4 text-gray-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                +${portfolioData.totalProfit.toLocaleString()}
               </div>
+              <div className="flex items-center text-sm text-green-600 mt-1">
+                <ArrowUpRight className="w-3 h-3 mr-1" />
+                {portfolioData.profitPercent}% gain
+              </div>
+            </CardContent>
+          </Card>
 
-              <div className="bg-black/40 border border-white/10 backdrop-blur-sm rounded-lg p-6">
-                <div className="text-sm font-medium text-gray-300 mb-2">Assets</div>
-                <div className="text-2xl font-bold text-white">{cryptoData.length}</div>
-                <div className="text-sm text-gray-400">Cryptocurrencies</div>
-              </div>
-            </div>
-          </div>
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Performance</CardTitle>
+              <BarChart3 className="h-4 w-4 text-gray-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">Excellent</div>
+              <p className="text-xs text-gray-600 mt-1">Above market average</p>
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* Holdings Table */}
-          <div className="bg-black/40 border border-white/10 backdrop-blur-sm rounded-lg">
-            <div className="p-6 border-b border-white/10">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white">Your Holdings</h3>
-                <button className="p-2 text-gray-400 hover:text-white transition-colors">
-                  <Filter className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-            <div className="p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Holdings */}
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Your Holdings
+                <Button variant="outline" size="sm">View All</Button>
+              </CardTitle>
+              <CardDescription>Your current cryptocurrency positions</CardDescription>
+            </CardHeader>
+            <CardContent>
               <div className="space-y-4">
-                {cryptoData.map((crypto: any, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                  >
+                {holdings.map((holding, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-full ${crypto.color} flex items-center justify-center`}>
-                        <span className="text-white font-bold text-sm">{crypto.symbol.charAt(0)}</span>
+                      <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">{holding.symbol[0]}</span>
                       </div>
                       <div>
-                        <div className="font-medium text-white">{crypto.name}</div>
-                        <div className="text-sm text-gray-400">{crypto.symbol}</div>
+                        <div className="font-semibold text-gray-900">{holding.name}</div>
+                        <div className="text-sm text-gray-500">{holding.amount} {holding.symbol}</div>
                       </div>
                     </div>
-
                     <div className="text-right">
-                      <div className="font-medium text-white">${crypto.price.toLocaleString()}</div>
-                      <div className={`text-sm ${crypto.change >= 0 ? "text-green-400" : "text-red-400"}`}>
-                        {crypto.change >= 0 ? "+" : ""}
-                        {crypto.change.toFixed(1)}%
+                      <div className="font-semibold text-gray-900">${holding.value.toLocaleString()}</div>
+                      <div className="flex items-center space-x-2">
+                        <Badge className={holding.positive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
+                          {holding.positive ? '+' : ''}{holding.change}%
+                        </Badge>
+                        <span className="text-sm text-gray-500">{holding.allocation}%</span>
                       </div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="font-medium text-white">{crypto.amount.toLocaleString()}</div>
-                      <div className="text-sm text-gray-400">{crypto.symbol}</div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="font-medium text-white">${crypto.value.toLocaleString()}</div>
-                      <div className="text-sm text-gray-400">{((crypto.value / totalValue) * 100).toFixed(1)}%</div>
                     </div>
                   </div>
                 ))}
-                
-                {cryptoData.length === 0 && (
-                  <div className="text-center py-12">
-                    <div className="text-gray-400 mb-4">No investments found</div>
-                    <Link to="/invest" className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg inline-flex items-center transition-colors">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Start Investing
-                    </Link>
-                  </div>
-                )}
               </div>
-            </div>
-          </div>
-        </main>
+            </CardContent>
+          </Card>
+
+          {/* Recent Transactions */}
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Recent Activity
+                <Button variant="outline" size="sm">View All</Button>
+              </CardTitle>
+              <CardDescription>Your latest transactions and activities</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentTransactions.map((transaction, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50">
+                    <div className="flex items-center space-x-4">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        transaction.type === 'buy' ? 'bg-green-100' :
+                        transaction.type === 'sell' ? 'bg-red-100' : 'bg-blue-100'
+                      }`}>
+                        {transaction.type === 'buy' ? <TrendingUp className="w-4 h-4 text-green-600" /> :
+                         transaction.type === 'sell' ? <TrendingDown className="w-4 h-4 text-red-600" /> :
+                         <Wallet className="w-4 h-4 text-blue-600" />}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900 capitalize">
+                          {transaction.type} {transaction.asset}
+                        </div>
+                        <div className="text-sm text-gray-500">{transaction.time}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-gray-900">
+                        {transaction.type === 'sell' ? '-' : ''}${transaction.value.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {transaction.amount} {transaction.asset}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

@@ -1,65 +1,34 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { loadUser } from './redux/thunks/authThunks';
-import { setAuthToken } from './services/api';
-import { ThemeProvider } from './context/ThemeContext';
-import { RootState, AppDispatch } from './redux/store';
 
-import Navbar from './components/common/Navbar';
-import PrivateRoute from './components/common/PrivateRoute';
-import AdminRoute from './components/common/AdminRoute';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
+import NotFound from "./pages/NotFound";
 
-import HomePage from './pages/HomePage';
-import DashboardPage from './pages/DashboardPage';
-import InvestPage from './pages/InvestPage';
-import PortfolioPage from './pages/PortfolioPage';
-import WalletPage from './pages/WalletPage';
-import ProfilePage from './pages/ProfilePage';
-import AdminPage from './pages/AdminPage';
-import CryptoDetailPage from './pages/CryptoDetailPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import NotFoundPage from './pages/NotFoundPage';
+const queryClient = new QueryClient();
 
-const App: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setAuthToken(token); // 🔐 sets token in Axios
-      dispatch(loadUser());
-    }
-  }, [dispatch]);
-
-  console.log("✅ App loaded at", window.location.pathname);
-
-  return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <Navbar />
-        <main className="text-white">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/dashboard" />} />
-            <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
-            <Route path="/invest" element={<PrivateRoute><InvestPage /></PrivateRoute>} />
-            <Route path="/portfolio" element={<PrivateRoute><PortfolioPage /></PrivateRoute>} />
-            <Route path="/crypto/:id" element={<PrivateRoute><CryptoDetailPage /></PrivateRoute>} />
-            <Route path="/wallet" element={<PrivateRoute><WalletPage /></PrivateRoute>} />
-            <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
-            <Route path="/admin/*" element={<AdminRoute><AdminPage /></AdminRoute>} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </main>
-      </div>
-    </ThemeProvider>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;
