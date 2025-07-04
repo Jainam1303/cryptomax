@@ -62,23 +62,17 @@ const Index = () => {
             <div className="flex items-center space-x-4">
               {!isLoggedIn ? (
                 <>
-                  <Link to="/login">
-                    <Button variant="ghost" className="text-gray-600 hover:text-blue-600">
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link to="/register">
-                    <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                      Get Started
-                    </Button>
-                  </Link>
+                  <Button variant="ghost" asChild className="text-gray-600 hover:text-blue-600">
+                    <Link to="/login">Sign In</Link>
+                  </Button>
+                  <Button asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                    <Link to="/register">Get Started</Link>
+                  </Button>
                 </>
               ) : (
-                <Link to="/dashboard">
-                  <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                    Dashboard
-                  </Button>
-                </Link>
+                <Button asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                  <Link to="/dashboard">Dashboard</Link>
+                </Button>
               )}
             </div>
           </div>
@@ -107,12 +101,12 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/register">
-                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8">
+              <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8">
+                <Link to="/register">
                   Start Investing Now
                   <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
               <Button size="lg" variant="outline" className="border-gray-300 hover:border-blue-300">
                 Watch Demo
               </Button>
@@ -211,11 +205,9 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/register">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8">
-                Create Free Account
-              </Button>
-            </Link>
+            <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8">
+              <Link to="/register">Create Free Account</Link>
+            </Button>
             <Button size="lg" variant="outline" className="border-gray-300 hover:border-blue-300">
               Learn More
             </Button>
