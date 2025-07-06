@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { RootState, AppDispatch } from "../redux/store";
+import { register } from '../redux/thunks/authThunks';
+import { useToast } from '../hooks/use-toast';
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,9 +20,41 @@ const RegisterPage = () => {
     confirmPassword: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { loading, error } = useSelector((state: RootState) => state.auth);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Register attempt:', formData);
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Registration Failed",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await dispatch(register({ 
+        name: formData.fullName, 
+        email: formData.email, 
+        password: formData.password 
+      })).unwrap();
+      toast({
+        title: "Registration Successful",
+        description: "Welcome to CryptoMax!",
+      });
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description: error || "Registration failed",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -140,9 +176,17 @@ const RegisterPage = () => {
               
               <Button 
                 type="submit" 
+                disabled={loading}
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
               >
-                Create Account
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  'Create Account'
+                )}
               </Button>
             </form>
             
