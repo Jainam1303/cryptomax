@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, DollarSign, PieChart, Activity, ArrowUpRight, ArrowDownRight, Plus, Eye, BarChart3, Minus, Loader2 } from 'lucide-react';
-import { RootState, AppDispatch } from '../redux/store';
-import { getPortfolio, getInvestments } from '../redux/thunks/investmentThunks';
-import { formatCurrency, formatPercentage } from '../utils/formatters';
+import { TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Minus, Loader2 } from 'lucide-react';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useInvestment } from '../context/InvestmentContext';
 import { useAuth } from '../context/AuthContext';
@@ -14,9 +10,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const PortfolioPage: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { portfolio, investments, loading } = useSelector((state: RootState) => state.investment);
-  const { getPortfolio, getInvestments, sellInvestment } = useInvestment();
+  const { investments, portfolio, loading, getPortfolio, getInvestments, sellInvestment } = useInvestment();
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'holdings' | 'performance'>('overview');
   const [selectedInvestment, setSelectedInvestment] = useState<any>(null);
