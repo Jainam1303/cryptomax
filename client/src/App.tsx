@@ -15,8 +15,10 @@ import WalletPage from "./pages/WalletPage";
 import CryptoPage from "./pages/CryptoPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import TransactionsPage from "./pages/TransactionsPage";
+import AdminPage from "./pages/AdminPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/common/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +60,11 @@ const App = () => (
                     <ProtectedRoute>
                       <TransactionsPage />
                     </ProtectedRoute>
+                  } />
+                  <Route path="/admin" element={
+                    <AdminRoute>
+                      <AdminPage />
+                    </AdminRoute>
                   } />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
