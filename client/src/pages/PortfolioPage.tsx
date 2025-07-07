@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Minus, Loader2, ArrowLeft } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Minus, Loader2 } from 'lucide-react';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useInvestment } from '../context/InvestmentContext';
 import { useAuth } from '../context/AuthContext';
@@ -63,7 +63,7 @@ const PortfolioPage: React.FC = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <Link to="/dashboard" className="flex items-center text-gray-600 hover:text-gray-900">
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <span className="mr-2 font-bold">←</span>
                 Back to Dashboard
               </Link>
               <div className="flex items-center space-x-2">
