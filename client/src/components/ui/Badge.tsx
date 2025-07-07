@@ -9,27 +9,45 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+          "border-transparent bg-gray-900 text-white hover:bg-gray-800",
+        primary:
+          "border-transparent bg-blue-600 text-white hover:bg-blue-700",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "border-transparent bg-gray-200 text-gray-900 hover:bg-gray-300",
+        success:
+          "border-transparent bg-green-600 text-white hover:bg-green-700",
+        warning:
+          "border-transparent bg-yellow-500 text-white hover:bg-yellow-600",
+        danger:
+          "border-transparent bg-red-600 text-white hover:bg-red-700",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
+          "border-transparent bg-red-600 text-white hover:bg-red-700",
+        outline: "text-foreground border-gray-300",
+      },
+      size: {
+        default: "px-2.5 py-0.5 text-xs",
+        sm: "px-2 py-0.5 text-xs",
+        lg: "px-3 py-1 text-sm",
       },
     },
     defaultVariants: {
       variant: "default",
+      size: "default",
     },
   }
 )
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+    VariantProps<typeof badgeVariants> {
+  children?: React.ReactNode;
+  variant?: "default" | "primary" | "secondary" | "success" | "warning" | "danger" | "destructive" | "outline";
+  size?: "default" | "sm" | "lg";
+}
 
-function Badge({ className, variant, ...props }: BadgeProps) {
+function Badge({ className, variant, size, ...props }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <div className={cn(badgeVariants({ variant, size }), className)} {...props} />
   )
 }
 

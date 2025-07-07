@@ -6,7 +6,7 @@ import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import Spinner from '../ui/Spinner';
-import Badge from '../ui/Badge';
+import { Badge } from '../ui/Badge';
 
 const TransactionHistory: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
