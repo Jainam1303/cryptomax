@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
-import { RootState, AppDispatch } from "../redux/store";
-import { login } from '../redux/thunks/authThunks';
-import { useToast } from '../hooks/use-toast';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,26 +14,16 @@ const LoginPage = () => {
     password: ''
   });
 
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { login, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await dispatch(login(formData)).unwrap();
-      toast({
-        title: "Login Successful",
-        description: "Welcome back!",
-      });
+      await login(formData.email, formData.password);
       navigate('/dashboard');
-    } catch (error: any) {
-      toast({
-        title: "Login Failed",
-        description: error || "Invalid credentials",
-        variant: "destructive",
-      });
+    } catch (error) {
+      // Error handling is done in the AuthContext
     }
   };
 

@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { User, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
-import { RootState, AppDispatch } from "../redux/store";
-import { register } from '../redux/thunks/authThunks';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../hooks/use-toast';
 
 const RegisterPage = () => {
@@ -20,10 +18,9 @@ const RegisterPage = () => {
     confirmPassword: ''
   });
 
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { register, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,22 +35,10 @@ const RegisterPage = () => {
     }
 
     try {
-      await dispatch(register({ 
-        name: formData.fullName, 
-        email: formData.email, 
-        password: formData.password 
-      })).unwrap();
-      toast({
-        title: "Registration Successful",
-        description: "Welcome to CryptoMax!",
-      });
+      await register(formData.fullName, formData.email, formData.password);
       navigate('/dashboard');
-    } catch (error: any) {
-      toast({
-        title: "Registration Failed",
-        description: error || "Registration failed",
-        variant: "destructive",
-      });
+    } catch (error) {
+      // Error handling is done in the AuthContext
     }
   };
 
