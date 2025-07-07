@@ -1,31 +1,330 @@
-import React, { useState } from 'react';
-import Wallet from '../components/wallet/Wallet';
-import TransactionHistory from '../components/wallet/TransactionHistory';
-import Sidebar from '../components/common/Sidebar';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Wallet, Plus, Minus, ArrowLeft, TrendingUp, TrendingDown, DollarSign, Loader2 } from "lucide-react";
+import { useWallet } from '../context/WalletContext';
+import { useAuth } from '../context/AuthContext';
 
-const WalletPage: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const WalletPage = () => {
+  const { wallet, transactions, loading, getWallet, getTransactions, deposit, withdraw } = useWallet();
+  const { user, logout } = useAuth();
   
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [depositMethod, setDepositMethod] = useState('');
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawMethod, setWithdrawMethod] = useState('');
+  const [withdrawDetails, setWithdrawDetails] = useState('');
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
+
+  useEffect(() => {
+    getWallet();
+    getTransactions();
+  }, []);
+
+  const handleDeposit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await deposit(Number(depositAmount), depositMethod);
+      setDepositAmount('');
+      setDepositMethod('');
+      setIsDepositOpen(false);
+    } catch (error) {
+      // Error handled in context
+    }
   };
-  
+
+  const handleWithdraw = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await withdraw(Number(withdrawAmount), withdrawMethod, { details: withdrawDetails });
+      setWithdrawAmount('');
+      setWithdrawMethod('');
+      setWithdrawDetails('');
+      setIsWithdrawOpen(false);
+    } catch (error) {
+      // Error handled in context
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Navigation */}
+      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-4">
+              <Link to="/dashboard" className="flex items-center text-gray-600 hover:text-gray-900">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Link>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">CM</span>
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  CryptoMax
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-700">Welcome, {user?.name}</span>
+              <Button variant="outline" onClick={logout}>
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            My <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Wallet</span>
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Manage your funds, make deposits and withdrawals, and track all your transactions.
-          </p>
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Wallet</h1>
+          <p className="text-gray-600">Manage your funds and view transaction history.</p>
         </div>
-        
-        <div className="space-y-8">
-          <Wallet />
-          <TransactionHistory />
+
+        {/* Wallet Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Available Balance</CardTitle>
+              <DollarSign className="h-4 w-4 text-gray-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900">
+                ${wallet?.balance?.toLocaleString() || '0.00'}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">Ready to invest</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Deposited</CardTitle>
+              <TrendingUp className="h-4 w-4 text-gray-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                ${wallet?.totalDeposited?.toLocaleString() || '0.00'}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">All time deposits</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Withdrawn</CardTitle>
+              <TrendingDown className="h-4 w-4 text-gray-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">
+                ${wallet?.totalWithdrawn?.toLocaleString() || '0.00'}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">All time withdrawals</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Pending</CardTitle>
+              <Wallet className="h-4 w-4 text-gray-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">
+                ${(wallet?.pendingDeposits || 0) + (wallet?.pendingWithdrawals || 0)}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">Pending transactions</p>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4 mb-8">
+          <Dialog open={isDepositOpen} onOpenChange={setIsDepositOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">
+                <Plus className="w-4 h-4 mr-2" />
+                Deposit Funds
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Deposit Funds</DialogTitle>
+                <DialogDescription>
+                  Add money to your CryptoMax wallet to start investing.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleDeposit} className="space-y-4">
+                <div>
+                  <Label htmlFor="deposit-amount">Amount</Label>
+                  <Input
+                    id="deposit-amount"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="Enter amount"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="deposit-method">Payment Method</Label>
+                  <Select value={depositMethod} onValueChange={setDepositMethod} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select payment method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="credit_card">Credit Card</SelectItem>
+                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="paypal">PayPal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Deposit Funds'
+                  )}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-50">
+                <Minus className="w-4 h-4 mr-2" />
+                Withdraw Funds
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Withdraw Funds</DialogTitle>
+                <DialogDescription>
+                  Request a withdrawal from your CryptoMax wallet.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleWithdraw} className="space-y-4">
+                <div>
+                  <Label htmlFor="withdraw-amount">Amount</Label>
+                  <Input
+                    id="withdraw-amount"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    max={wallet?.balance || 0}
+                    placeholder="Enter amount"
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Available: ${wallet?.balance?.toLocaleString() || '0.00'}
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="withdraw-method">Withdrawal Method</Label>
+                  <Select value={withdrawMethod} onValueChange={setWithdrawMethod} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select withdrawal method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="paypal">PayPal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="withdraw-details">Payment Details</Label>
+                  <Input
+                    id="withdraw-details"
+                    placeholder="Enter account details"
+                    value={withdrawDetails}
+                    onChange={(e) => setWithdrawDetails(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Request Withdrawal'
+                  )}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Recent Transactions */}
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              Recent Transactions
+              <Link to="/transactions">
+                <Button variant="outline" size="sm">View All</Button>
+              </Link>
+            </CardTitle>
+            <CardDescription>Your latest wallet transactions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {transactions.length > 0 ? (
+                transactions.slice(0, 10).map((transaction, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50">
+                    <div className="flex items-center space-x-4">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        transaction.type === 'deposit' ? 'bg-green-100' : 'bg-red-100'
+                      }`}>
+                        {transaction.type === 'deposit' ? 
+                          <TrendingUp className="w-4 h-4 text-green-600" /> :
+                          <TrendingDown className="w-4 h-4 text-red-600" />
+                        }
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900 capitalize">
+                          {transaction.type}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(transaction.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`font-semibold ${
+                        transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-gray-500 capitalize">
+                        {transaction.status}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No transactions yet. Make your first deposit to get started!</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

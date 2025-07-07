@@ -1,33 +1,25 @@
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/Badge";
-import { TrendingUp, TrendingDown, Wallet, PieChart, BarChart3, ArrowUpRight, ArrowDownRight, Plus, LogOut } from "lucide-react";
-import { RootState, AppDispatch } from "../redux/store";
-import { logoutUser } from '../redux/thunks/authThunks';
-import { useNavigate } from 'react-router-dom';
+import { TrendingUp, TrendingDown, Wallet, PieChart, BarChart3, ArrowUpRight, ArrowDownRight, Plus, LogOut, Search, CreditCard, BarChart2 } from "lucide-react";
+import { useAuth } from '../context/AuthContext';
+import { useWallet } from '../context/WalletContext';
+import { useInvestment } from '../context/InvestmentContext';
 
 const DashboardPage = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { wallet } = useSelector((state: RootState) => state.wallet);
-  const { portfolio, investments } = useSelector((state: RootState) => state.investment);
-  const { cryptos } = useSelector((state: RootState) => state.crypto);
+  const { user, logout } = useAuth();
+  const { wallet, transactions, getWallet, getTransactions } = useWallet();
+  const { portfolio, investments, getPortfolio, getInvestments } = useInvestment();
 
   useEffect(() => {
     // Load data when component mounts
-    // dispatch(getWallet());
-    // dispatch(getPortfolio());
-    // dispatch(getInvestments());
-    // dispatch(getCryptos());
-  }, [dispatch]);
-
-  const handleLogout = () => {
-    dispatch(logoutUser());
-    navigate('/');
-  };
+    getWallet();
+    getPortfolio();
+    getInvestments();
+    getTransactions();
+  }, []);
 
   // Fallback data for when API data is not available
   const portfolioData = portfolio?.summary || {
@@ -38,7 +30,7 @@ const DashboardPage = () => {
   };
 
   const holdings = investments || [];
-  const recentTransactions = wallet?.transactions || [];
+  const recentTransactions = transactions || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -57,11 +49,13 @@ const DashboardPage = () => {
             
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">Welcome, {user?.name}</span>
-              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Invest Now
-              </Button>
-              <Button variant="outline" onClick={handleLogout}>
+              <Link to="/crypto">
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Invest Now
+                </Button>
+              </Link>
+              <Button variant="outline" onClick={logout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </Button>
@@ -75,6 +69,49 @@ const DashboardPage = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
           <p className="text-gray-600">Welcome back, {user?.name}! Here's your portfolio overview.</p>
+        </div>
+
+        {/* Quick Navigation */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Link to="/wallet">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <CardContent className="p-6 text-center">
+                <CreditCard className="h-8 w-8 mx-auto mb-3 text-blue-600" />
+                <h3 className="font-semibold text-gray-900 mb-1">Wallet</h3>
+                <p className="text-sm text-gray-600">Deposit & Withdraw</p>
+              </CardContent>
+            </Card>
+          </Link>
+          
+          <Link to="/crypto">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <CardContent className="p-6 text-center">
+                <Search className="h-8 w-8 mx-auto mb-3 text-green-600" />
+                <h3 className="font-semibold text-gray-900 mb-1">Explore Crypto</h3>
+                <p className="text-sm text-gray-600">Search & Invest</p>
+              </CardContent>
+            </Card>
+          </Link>
+          
+          <Link to="/portfolio">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <CardContent className="p-6 text-center">
+                <BarChart2 className="h-8 w-8 mx-auto mb-3 text-purple-600" />
+                <h3 className="font-semibold text-gray-900 mb-1">Portfolio</h3>
+                <p className="text-sm text-gray-600">Track Performance</p>
+              </CardContent>
+            </Card>
+          </Link>
+          
+          <Link to="/transactions">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <CardContent className="p-6 text-center">
+                <BarChart3 className="h-8 w-8 mx-auto mb-3 text-orange-600" />
+                <h3 className="font-semibold text-gray-900 mb-1">Transactions</h3>
+                <p className="text-sm text-gray-600">View History</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Portfolio Overview */}
