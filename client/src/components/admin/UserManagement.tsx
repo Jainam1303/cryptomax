@@ -6,7 +6,7 @@ import { RootState, AppDispatch } from '../../redux/store';
 import { formatDate } from '../../utils/formatters';
 import Card from '../ui/Card';
 import Input from '../ui/Input';
-import Badge from '../ui/Badge';
+import { Badge } from '../ui/Badge';
 import Spinner from '../ui/Spinner';
 
 const UserManagement: React.FC = () => {

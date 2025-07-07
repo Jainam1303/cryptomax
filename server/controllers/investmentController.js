@@ -36,9 +36,11 @@ exports.getInvestments = async (req, res) => {
     try {
       const investmentCount = await Investment.countDocuments();
       if (investmentCount === 0) {
-        console.log('📊 No investments in database - checking mock investments');
-        // Get mock investments for this user
-        investments = getMockInvestments(req.user.id);
+        console.log('📊 No investments in database - using shared mock investments');
+        // Load crypto data for price calculations
+        const cryptos = loadMockCryptos();
+        // Get shared mock investments for all users
+        investments = getMockInvestments(req.user.id, cryptos);
       } else {
         investments = await Investment.find({ 
           user: req.user.id,
@@ -46,8 +48,11 @@ exports.getInvestments = async (req, res) => {
         }).populate('crypto', 'name symbol currentPrice image priceChangePercentage24h');
       }
     } catch (dbError) {
-      console.log('⚠️ Database unavailable - checking mock investments');
-      investments = getMockInvestments(req.user.id);
+      console.log('⚠️ Database unavailable - using shared mock investments');
+      // Load crypto data for price calculations
+      const cryptos = loadMockCryptos();
+      // Get shared mock investments for all users
+      investments = getMockInvestments(req.user.id, cryptos);
     }
     
     res.json(investments);
@@ -296,8 +301,10 @@ exports.getPortfolio = async (req, res) => {
     try {
       const investmentCount = await Investment.countDocuments();
       if (investmentCount === 0) {
-        console.log('📊 No investments in database - checking mock investments for portfolio');
-        investments = getMockInvestments(req.user.id);
+        console.log('📊 No investments in database - using shared mock investments for portfolio');
+        // Load crypto data for price calculations
+        const cryptos = loadMockCryptos();
+        investments = getMockInvestments(req.user.id, cryptos);
       } else {
         investments = await Investment.find({ 
           user: req.user.id,
@@ -305,8 +312,10 @@ exports.getPortfolio = async (req, res) => {
         }).populate('crypto', 'name symbol currentPrice image');
       }
     } catch (dbError) {
-      console.log('⚠️ Database unavailable - checking mock investments for portfolio');
-      investments = getMockInvestments(req.user.id);
+      console.log('⚠️ Database unavailable - using shared mock investments for portfolio');
+      // Load crypto data for price calculations
+      const cryptos = loadMockCryptos();
+      investments = getMockInvestments(req.user.id, cryptos);
     }
     
     let totalInvested = 0;

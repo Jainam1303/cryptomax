@@ -5,7 +5,7 @@ import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
-import Badge from '../ui/Badge';
+import { Badge } from '../ui/Badge';
 import Spinner from '../ui/Spinner';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
