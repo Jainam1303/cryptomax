@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Minus, Loader2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Minus, Loader2, ArrowLeft } from 'lucide-react';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useInvestment } from '../context/InvestmentContext';
 import { useAuth } from '../context/AuthContext';
