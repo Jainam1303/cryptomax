@@ -49,6 +49,13 @@ const DashboardPage = () => {
             
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">Welcome, {user?.name}</span>
+              {user?.role === 'admin' && (
+                <Link to="/admin">
+                  <Button variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50">
+                    Admin Panel
+                  </Button>
+                </Link>
+              )}
               <Link to="/crypto">
                 <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                   <Plus className="w-4 h-4 mr-2" />
