@@ -19,7 +19,8 @@ const PortfolioPage: React.FC = () => {
   useEffect(() => {
     getPortfolio();
     getInvestments();
-  }, [getPortfolio, getInvestments]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSellInvestment = async () => {
     if (!selectedInvestment) return;
