@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
 const cryptoController = require('../../controllers/cryptoController');
+const adminController = require('../../controllers/adminController');
 
 // @route   GET api/crypto
 // @desc    Get all cryptocurrencies
@@ -22,5 +23,8 @@ router.get('/:id', auth, cryptoController.getCryptoById);
 // @desc    Get cryptocurrency price history
 // @access  Private
 router.get('/:id/price-history', auth, cryptoController.getPriceHistory);
+
+// Public: Get deposit wallet info
+router.get('/deposit-wallets/:coin', adminController.getDepositWallet);
 
 module.exports = router;

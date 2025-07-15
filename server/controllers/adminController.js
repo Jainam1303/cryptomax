@@ -4,6 +4,8 @@ const Investment = require('../models/Investment');
 const WithdrawalRequest = require('../models/WithdrawalRequest');
 const Transaction = require('../models/Transaction');
 const Wallet = require('../models/Wallet');
+const DepositWallet = require('../models/DepositWallet');
+const path = require('path');
 
 // @route   GET api/admin/users
 // @desc    Get all users
@@ -268,6 +270,113 @@ exports.getInvestments = async (req, res) => {
     res.json(investments);
   } catch (err) {
     console.error('Admin get investments error:', err.message);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// @route   GET api/admin/deposit-requests
+// @desc    Get all pending deposit requests
+// @access  Private/Admin
+exports.getDepositRequests = async (req, res) => {
+  try {
+    const depositRequests = await Transaction.find({ type: 'deposit', status: 'pending' })
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 });
+    res.json(depositRequests);
+  } catch (err) {
+    console.error('Admin get deposit requests error:', err.message, err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// @route   PUT api/admin/deposit-requests/:id
+// @desc    Approve or reject a deposit request
+// @access  Private/Admin
+exports.processDepositRequest = async (req, res) => {
+  try {
+    const { status, adminNotes } = req.body;
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ msg: 'Invalid status' });
+    }
+    const transaction = await Transaction.findById(req.params.id);
+    if (!transaction || transaction.type !== 'deposit') {
+      return res.status(404).json({ msg: 'Deposit transaction not found' });
+    }
+    if (transaction.status !== 'pending') {
+      return res.status(400).json({ msg: 'Deposit already processed' });
+    }
+    // Find user's wallet
+    const wallet = await Wallet.findOne({ user: transaction.user });
+    if (!wallet) {
+      return res.status(404).json({ msg: 'User wallet not found' });
+    }
+    if (status === 'approved') {
+      // Credit wallet balance
+      wallet.balance += transaction.amount;
+      wallet.totalDeposited += transaction.amount;
+      await wallet.save();
+      transaction.status = 'completed';
+      transaction.completedAt = Date.now();
+      transaction.description += ' (Approved by admin)';
+    } else if (status === 'rejected') {
+      transaction.status = 'failed';
+      transaction.failureReason = adminNotes || 'Rejected by admin';
+      transaction.description += ' (Rejected by admin)';
+    }
+    await transaction.save();
+    res.json({ success: true, transaction });
+  } catch (err) {
+    console.error('Process deposit request error:', err.message);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Public: Get deposit wallet info for a coin
+exports.getDepositWallet = async (req, res) => {
+  try {
+    const { coin } = req.params;
+    const wallet = await DepositWallet.findOne({ coin });
+    if (!wallet) {
+      return res.status(404).json({ msg: 'Deposit wallet not found' });
+    }
+    res.json(wallet);
+  } catch (err) {
+    console.error('Get deposit wallet error:', err.message);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Admin: Update deposit wallet info for a coin
+exports.updateDepositWallet = async (req, res) => {
+  try {
+    const { coin } = req.params;
+    const { address, qrImageUrl } = req.body;
+    let wallet = await DepositWallet.findOne({ coin });
+    if (!wallet) {
+      wallet = new DepositWallet({ coin, address, qrImageUrl });
+    } else {
+      wallet.address = address;
+      wallet.qrImageUrl = qrImageUrl;
+    }
+    await wallet.save();
+    res.json(wallet);
+  } catch (err) {
+    console.error('Update deposit wallet error:', err.message);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Upload QR code image for deposit wallet
+exports.uploadDepositWalletQr = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ msg: 'No file uploaded' });
+    }
+    // Construct the URL to access the uploaded file
+    const qrImageUrl = `/uploads/${req.file.filename}`;
+    res.json({ qrImageUrl });
+  } catch (err) {
+    console.error('Upload deposit wallet QR error:', err.message);
     res.status(500).json({ msg: 'Server error' });
   }
 };

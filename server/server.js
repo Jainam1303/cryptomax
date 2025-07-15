@@ -28,6 +28,10 @@ app.use('/', routes);
 // Error handler middleware (must be after routes)
 app.use(errorHandler);
 
+// Serve uploads directory for QR code images
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Define port
 const PORT = process.env.PORT || 5000;
 

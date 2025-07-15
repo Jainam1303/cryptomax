@@ -3,6 +3,20 @@ const router = express.Router();
 const auth = require('../../middleware/auth');
 const admin = require('../../middleware/admin');
 const adminController = require('../../controllers/adminController');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../../uploads'));
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
+    cb(null, uniqueName);
+  }
+});
+const upload = multer({ storage });
 
 // All routes in this file require both auth and admin middleware
 router.use(auth);
@@ -42,5 +56,16 @@ router.get('/investments', (req, res, next) => { console.log('GET /api/admin/inv
 // @desc    Get admin dashboard data
 // @access  Private/Admin
 router.get('/dashboard', (req, res, next) => { console.log('GET /api/admin/dashboard'); next(); }, adminController.getDashboardData);
+
+// Admin: Update deposit wallet info
+router.put('/deposit-wallets/:coin', adminController.updateDepositWallet);
+
+// Admin: Upload deposit wallet QR code image
+router.post('/deposit-wallets/:coin/qr-upload', upload.single('qr'), adminController.uploadDepositWalletQr);
+
+// Admin: List all pending deposit requests
+router.get('/deposit-requests', adminController.getDepositRequests);
+// Admin: Approve/reject a deposit request
+router.put('/deposit-requests/:id', adminController.processDepositRequest);
 
 module.exports = router;

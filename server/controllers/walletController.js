@@ -27,7 +27,7 @@ exports.getWallet = async (req, res) => {
 // @access  Private
 exports.deposit = async (req, res) => {
   try {
-    const { amount, paymentMethod } = req.body;
+    const { amount, paymentMethod, txid } = req.body;
     
     if (amount <= 0) {
       return res.status(400).json({ msg: 'Amount must be greater than 0' });
@@ -36,25 +36,20 @@ exports.deposit = async (req, res) => {
     // Use wallet from middleware
     const wallet = req.wallet;
     
-    // In a real app, you would integrate with a payment processor here
-    // For this demo, we'll simulate an instant deposit
-    
-    // Create transaction record
+    // Create transaction record (pending)
     const transaction = new Transaction({
       user: req.user.id,
       type: 'deposit',
       amount,
-      status: 'completed',
+      status: 'pending',
       description: `Deposit via ${paymentMethod}`,
-      completedAt: Date.now()
+      txid: txid || ''
     });
     
     await transaction.save();
     
-    // Update wallet
-    wallet.balance += amount;
-    wallet.totalDeposited += amount;
-    await wallet.save();
+    // Do NOT credit wallet balance yet; wait for admin approval
+    // Optionally, you can store a pendingDeposits field in wallet if you want
     
     res.json({
       success: true,
