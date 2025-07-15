@@ -1,12 +1,12 @@
 const Crypto = require('../models/Crypto');
-const { io } = require('../server');
 
 function randomFluctuation(price, minPct = -0.2, maxPct = 0.2) {
   const pctChange = Math.random() * (maxPct - minPct) + minPct;
   return parseFloat((price * (1 + pctChange / 100)).toFixed(2));
 }
 
-async function updateCryptoPrices() {
+async function updateCryptoPrices(io) {
+  const Crypto = require('../models/Crypto');
   const cryptos = await Crypto.find();
   const updatedCryptos = [];
   for (const crypto of cryptos) {
@@ -42,8 +42,8 @@ async function updateCryptoPrices() {
   }
 }
 
-function startCryptoTicker(intervalMs = 2500) {
-  setInterval(updateCryptoPrices, intervalMs);
+function startCryptoTicker(io, intervalMs = 2500) {
+  setInterval(() => updateCryptoPrices(io), intervalMs);
 }
 
 module.exports = { startCryptoTicker }; 

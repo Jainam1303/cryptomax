@@ -119,7 +119,7 @@ const TransactionHistory: React.FC = () => {
                 {/* Transaction column */}
                 <td className="py-4 px-6 text-left">
                   <div className="flex items-center gap-4">
-                    <div className={`flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full
+                    <div className={`flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full 
                       ${['profit', 'deposit'].includes(transaction.type) ? 'bg-success-bg' : ''}
                       ${['withdrawal', 'loss', 'investment'].includes(transaction.type) ? 'bg-danger-bg' : ''}
                       ${!['profit', 'deposit', 'withdrawal', 'loss', 'investment'].includes(transaction.type) ? 'bg-muted' : ''}
@@ -144,7 +144,7 @@ const TransactionHistory: React.FC = () => {
                 {/* Date column */}
                 <td className="py-4 px-6 text-left">
                   <div className="text-sm text-foreground font-mono">
-                    {formatDate(transaction.createdAt, true)}
+                  {formatDate(transaction.createdAt, true)}
                   </div>
                 </td>
                 {/* Amount column */}

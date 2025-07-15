@@ -246,17 +246,17 @@ const TransactionsPage = () => {
                             ${['withdrawal', 'loss', 'investment'].includes(transaction.type) ? 'bg-danger-bg' : ''}
                             ${!['profit', 'deposit', 'withdrawal', 'loss', 'investment'].includes(transaction.type) ? 'bg-muted' : ''}
                           `}>
-                            {getTransactionIcon(transaction.type)}
-                          </div>
-                          <div>
+                      {getTransactionIcon(transaction.type)}
+                    </div>
+                    <div>
                             <div className="text-sm font-medium text-foreground capitalize">
-                              {transaction.type}
-                              {transaction.description && (
+                        {transaction.type}
+                        {transaction.description && (
                                 <span className="font-normal text-muted-foreground ml-2">
-                                  - {transaction.description}
-                                </span>
-                              )}
-                            </div>
+                            - {transaction.description}
+                          </span>
+                        )}
+                      </div>
                             <div className="text-xs text-muted-foreground font-mono">
                               {transaction.reference && (
                                 <>Ref: {transaction.reference}</>
@@ -274,30 +274,30 @@ const TransactionsPage = () => {
                       <td className="py-4 px-6 text-left">
                         <div className="text-sm text-foreground font-mono">
                           {new Date(transaction.createdAt).toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
                       </td>
                       {/* Amount column */}
                       <td className="py-4 px-6 text-right">
                         <div className={`text-sm font-medium font-mono ${getAmountColor(transaction.type)}`}>{
-                          transaction.type === 'deposit' || transaction.type === 'profit'
-                            ? `+${(transaction.amount ?? 0).toLocaleString()}`
-                            : transaction.type === 'loss' || transaction.type === 'withdrawal' || transaction.type === 'investment'
-                              ? `-${(transaction.amount ?? 0).toLocaleString()}`
-                              : (transaction.amount ?? 0).toLocaleString()
-                        }</div>
+                      transaction.type === 'deposit' || transaction.type === 'profit'
+                        ? `+${(transaction.amount ?? 0).toLocaleString()}`
+                        : transaction.type === 'loss' || transaction.type === 'withdrawal' || transaction.type === 'investment'
+                          ? `-${(transaction.amount ?? 0).toLocaleString()}`
+                          : (transaction.amount ?? 0).toLocaleString()
+                    }</div>
                         <div className="text-xs text-muted-foreground">{transaction.currency}</div>
                       </td>
                       {/* Status column */}
                       <td className="py-4 px-6 text-center">
-                        <Badge className={getStatusColor(transaction.status)}>
-                          {transaction.status}
-                        </Badge>
+                    <Badge className={getStatusColor(transaction.status)}>
+                      {transaction.status}
+                    </Badge>
                       </td>
                     </tr>
                   ))}

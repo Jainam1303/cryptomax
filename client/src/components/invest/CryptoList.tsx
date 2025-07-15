@@ -126,70 +126,63 @@ const CryptoList: React.FC = () => {
           <p className="text-gray-500">No cryptocurrencies found</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-50 border-b">
-                  <th className="py-4 px-6 font-medium text-sm text-gray-500 text-left" style={{width: '40%'}}>Cryptocurrency</th>
-                  <th className="py-4 px-6 font-medium text-sm text-gray-500 text-right" style={{width: '20%'}}>Price</th>
-                  <th className="py-4 px-6 font-medium text-sm text-gray-500 text-right" style={{width: '15%'}}>24h Change</th>
-                  <th className="py-4 px-6 font-medium text-sm text-gray-500 text-right" style={{width: '15%'}}>Market Cap</th>
-                  <th className="py-4 px-6 font-medium text-sm text-gray-500 text-center" style={{width: '10%'}}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCryptos?.map(crypto => (
-                  <tr key={crypto._id} className="hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => handleCryptoClick(crypto._id)}>
-                    {/* Name/Icon column */}
-                    <td className="py-4 px-6 text-left">
-                      <div className="flex items-center gap-4">
-                        {crypto.image ? (
-                          <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center">
-                            <span className="text-white font-bold">{crypto.symbol.charAt(0)}</span>
-                          </div>
-                        )}
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{crypto.name}</div>
-                          <div className="text-xs text-gray-500 font-mono">{crypto.symbol.toUpperCase()}</div>
+        <div className="overflow-x-auto">
+          <table className="w-full bg-white shadow-none">
+            <thead>
+              <tr className="bg-white">
+                <th className="py-4 px-6 font-medium text-sm text-gray-500 text-left" style={{width: '50%'}}>Cryptocurrency</th>
+                <th className="py-4 px-6 font-medium text-sm text-gray-500 text-right" style={{width: '25%'}}>Price</th>
+                <th className="py-4 px-6 font-medium text-sm text-gray-500 text-right" style={{width: '15%'}}>24h Change</th>
+                <th className="py-4 px-6 font-medium text-sm text-gray-500 text-center" style={{width: '10%'}}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCryptos?.map(crypto => (
+                <tr key={crypto._id} className="hover:bg-gray-50 transition-colors cursor-pointer">
+                  {/* Name/Icon column */}
+                  <td className="py-4 px-6 text-left" onClick={() => handleCryptoClick(crypto._id)}>
+                    <div className="flex items-center gap-4">
+                      {crypto.image ? (
+                        <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center">
+                          <span className="text-white font-bold">{crypto.symbol.charAt(0)}</span>
                         </div>
+                      )}
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{crypto.name}</div>
+                        <div className="text-xs text-gray-500 font-mono">{crypto.symbol.toUpperCase()}</div>
                       </div>
-                    </td>
-                    {/* Price column */}
-                    <td className="py-4 px-6 text-right">
-                      <div className="text-sm font-medium font-mono text-gray-900">{formatCurrency(crypto.currentPrice)}</div>
-                    </td>
-                    {/* 24h Change column */}
-                    <td className="py-4 px-6 text-right">
-                      <div className="inline-flex items-center">
-                        {crypto.priceChangePercentage24h >= 0 ? (
-                          <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
-                        )}
-                        <span className={`text-sm font-medium font-mono ${crypto.priceChangePercentage24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>{formatPercentage(crypto.priceChangePercentage24h)}</span>
-                      </div>
-                    </td>
-                    {/* Market Cap column */}
-                    <td className="py-4 px-6 text-right">
-                      <div className="text-sm font-medium font-mono text-gray-900">{formatCurrency(crypto.marketCap, true)}</div>
-                    </td>
-                    {/* Action column */}
-                    <td className="py-4 px-6 text-center">
-                      <button
-                        onClick={e => { e.stopPropagation(); handleCryptoClick(crypto._id); }}
-                        className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-150 ease-in-out"
-                      >
-                        Invest
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </td>
+                  {/* Price column */}
+                  <td className="py-4 px-6 text-right" onClick={() => handleCryptoClick(crypto._id)}>
+                    <div className="text-sm font-medium font-mono text-gray-900">{formatCurrency(crypto.currentPrice)}</div>
+                  </td>
+                  {/* 24h Change column */}
+                  <td className="py-4 px-6 text-right" onClick={() => handleCryptoClick(crypto._id)}>
+                    <div className="inline-flex items-center">
+                      {crypto.priceChangePercentage24h >= 0 ? (
+                        <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                      ) : (
+                        <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
+                      )}
+                      <span className={`text-sm font-medium font-mono ${crypto.priceChangePercentage24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>{formatPercentage(crypto.priceChangePercentage24h)}</span>
+                    </div>
+                  </td>
+                  {/* Action column */}
+                  <td className="py-4 px-6 text-center">
+                    <button
+                      onClick={e => { e.stopPropagation(); handleCryptoClick(crypto._id); }}
+                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-150 ease-in-out"
+                    >
+                      Invest
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

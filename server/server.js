@@ -56,5 +56,5 @@ io.on('connection', (socket) => {
 
 // Start server
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-startCryptoTicker();
+startCryptoTicker(io);
 

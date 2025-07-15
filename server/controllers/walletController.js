@@ -8,8 +8,14 @@ const { getMockTransactions } = require('../utils/mockDataManager');
 // @access  Private
 exports.getWallet = async (req, res) => {
   try {
-    // Wallet is ensured by middleware and attached to req.wallet
-    res.json(req.wallet);
+    const wallet = req.wallet;
+    // Dynamically calculate pending withdrawals
+    const pending = await Transaction.aggregate([
+      { $match: { user: wallet.user, type: 'withdrawal', status: 'pending' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    wallet.pendingWithdrawals = pending.length > 0 ? pending[0].total : 0;
+    res.json(wallet);
   } catch (err) {
     console.error('Get wallet error:', err.message);
     res.status(500).json({ msg: 'Server error' });

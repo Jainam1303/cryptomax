@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
@@ -47,6 +47,8 @@ const CryptoPage = () => {
   const [tickerCryptos, setTickerCryptos] = useState<Crypto[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [socket, setSocket] = useState<any>(null);
+  const [signalVisible, setSignalVisible] = useState<{ [id: string]: boolean }>({});
+  const signalTimeouts = useRef<{ [id: string]: NodeJS.Timeout }>({});
 
   // Initial fetch for cryptos on mount
   useEffect(() => {
@@ -73,6 +75,26 @@ const CryptoPage = () => {
       socket.disconnect();
     };
   }, []);
+
+  // Show signal after 5s if direction is up or down
+  useEffect(() => {
+    // Clear previous timeouts
+    Object.values(signalTimeouts.current).forEach(clearTimeout);
+    signalTimeouts.current = {};
+    const newSignals: { [id: string]: boolean } = {};
+    tickerCryptos.forEach(crypto => {
+      if (crypto.direction === 'up' || crypto.direction === 'down') {
+        signalTimeouts.current[crypto._id] = setTimeout(() => {
+          setSignalVisible(prev => ({ ...prev, [crypto._id]: true }));
+        }, 5000);
+        newSignals[crypto._id] = false;
+      }
+    });
+    setSignalVisible(newSignals);
+    return () => {
+      Object.values(signalTimeouts.current).forEach(clearTimeout);
+    };
+  }, [tickerCryptos.map(c => c._id + c.direction).join(',')]);
 
   const handleBuyInvestment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,11 +202,11 @@ const CryptoPage = () => {
                   ).map((crypto) => (
                     <div
                       key={crypto._id}
-                      className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer"
+                      className="grid grid-cols-5 gap-0 items-center p-4 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer"
                       onClick={() => openBuyDialog(crypto)}
                     >
-                      <div className="flex items-center space-x-4">
-                        {/* Show crypto image */}
+                      {/* Name, Symbol, Icon */}
+                      <div className="flex items-center gap-4">
                         {crypto.image ? (
                           <img src={crypto.image} alt={crypto.symbol} className="w-12 h-12 rounded-full object-cover" />
                         ) : (
@@ -197,10 +219,12 @@ const CryptoPage = () => {
                           <div className="text-sm text-gray-500">{crypto.symbol}</div>
                         </div>
                       </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-gray-900">
-                          ${crypto.currentPrice.toLocaleString()}
-                        </div>
+                      {/* Price */}
+                      <div className="text-gray-900 font-semibold text-right">
+                        ${crypto.currentPrice.toLocaleString()}
+                      </div>
+                      {/* 24h Change + Clock */}
+                      <div className="flex flex-col items-start ml-4">
                         <div className="flex items-center space-x-2">
                           <Badge 
                             className={
@@ -218,18 +242,28 @@ const CryptoPage = () => {
                             {crypto.priceChangePercentage24h.toFixed(2)}%
                           </Badge>
                         </div>
-                        <div className="text-xs text-gray-400 mt-1 text-right">Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : ''}</div>
+                        <div className="text-xs text-gray-400 mt-1 ml-1">{lastUpdated ? lastUpdated.toLocaleTimeString() : ''}</div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-500">Market Cap</div>
-                        <div className="font-semibold text-gray-900">
-                          ${crypto.marketCap.toLocaleString()}
-                        </div>
+                      {/* Signal Badge (always takes space) */}
+                      <div className="flex flex-col items-center min-h-[32px]">
+                        {signalVisible[crypto._id] && crypto.direction === 'up' && (
+                          <span className="inline-flex items-center px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-semibold">
+                            <TrendingUp className="w-3 h-3 mr-1" /> Buy Signal: Potential Uptrend
+                          </span>
+                        )}
+                        {signalVisible[crypto._id] && crypto.direction === 'down' && (
+                          <span className="inline-flex items-center px-2 py-1 rounded bg-red-100 text-red-700 text-xs font-semibold">
+                            <TrendingDown className="w-3 h-3 mr-1" /> Caution: Potential Downtrend
+                          </span>
+                        )}
                       </div>
-                      <Button size="sm" className="ml-4">
-                        <Plus className="w-4 h-4 mr-1" />
-                        Invest
-                      </Button>
+                      {/* Invest Button */}
+                      <div className="flex justify-end">
+                        <Button size="sm" className="ml-4">
+                          <Plus className="w-4 h-4 mr-1" />
+                          Invest
+                        </Button>
+                      </div>
                     </div>
                   ))
                 ) : (

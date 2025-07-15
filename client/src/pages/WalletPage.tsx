@@ -25,6 +25,12 @@ const WalletPage = () => {
   useEffect(() => {
     getWallet();
     getTransactions();
+    // Poll every 10 seconds for authentic data
+    const interval = setInterval(() => {
+      getWallet();
+      getTransactions();
+    }, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleDeposit = async (e: React.FormEvent) => {
@@ -41,6 +47,10 @@ const WalletPage = () => {
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (Number(withdrawAmount) < 50) {
+      alert('Minimum withdrawal amount is $50');
+      return;
+    }
     try {
       await withdraw(Number(withdrawAmount), withdrawMethod, { details: withdrawDetails });
       setWithdrawAmount('');
@@ -187,10 +197,8 @@ const WalletPage = () => {
                     <SelectTrigger>
                       <SelectValue placeholder="Select payment method" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="credit_card">Credit Card</SelectItem>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                      <SelectItem value="paypal">PayPal</SelectItem>
+                    <SelectContent className="bg-white dark:bg-gray-900">
+                      <SelectItem value="usdt">USDT (Tether)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -228,7 +236,7 @@ const WalletPage = () => {
                   <Input
                     id="withdraw-amount"
                     type="number"
-                    min="0.01"
+                    min="50"
                     step="0.01"
                     max={wallet?.balance || 0}
                     placeholder="Enter amount"
@@ -237,6 +245,7 @@ const WalletPage = () => {
                     required
                   />
                   <p className="text-xs text-gray-500 mt-1">
+                    Minimum withdrawal amount: $50<br />
                     Available: ${wallet?.balance?.toLocaleString() || '0.00'}
                   </p>
                 </div>
@@ -246,9 +255,8 @@ const WalletPage = () => {
                     <SelectTrigger>
                       <SelectValue placeholder="Select withdrawal method" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                      <SelectItem value="paypal">PayPal</SelectItem>
+                    <SelectContent className="bg-white dark:bg-gray-900">
+                      <SelectItem value="usdt_trc20">USDT (TRC20)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
