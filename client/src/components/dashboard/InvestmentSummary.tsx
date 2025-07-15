@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
-import Card from '../ui/Card';
-import Button from '../ui/Button';
+import Card from '../ui/card';
+import Button from '../ui/button';
 import { Portfolio } from '../../types';
+import { useDispatch } from 'react-redux';
+import { getCryptos } from '../../redux/thunks/cryptoThunks';
+import { AppDispatch } from '../../redux/store';
 
 interface InvestmentSummaryProps {
   portfolio: Portfolio | null;
@@ -24,13 +27,20 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ portfolio }) => {
   const { summary } = portfolio;
   const isProfitable = summary.totalProfitLoss >= 0;
   
+  const dispatch = useDispatch<AppDispatch>();
+  
+  useEffect(() => {
+    console.log("useEffect: dispatch(getCryptos) running");
+    dispatch(getCryptos());
+  }, [dispatch]);
+  
   return (
     <Card>
       <div className="flex items-center mb-4">
         <div className={`p-3 rounded-full ${
           isProfitable 
             ? 'bg-success-100 dark:bg-success-900/30 text-success-500' 
-            : 'bg-danger-100 dark:bg-danger-900/30 text-danger-500'
+            : 'bg-danger-900/30 text-danger-500'
         } mr-4`}>
           {isProfitable ? (
             <TrendingUp className="h-6 w-6" />

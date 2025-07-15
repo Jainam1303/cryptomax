@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getWithdrawalRequests, processWithdrawalRequest } from '../../redux/thunks/adminThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency, formatDate } from '../../utils/formatters';
-import Card from '../ui/Card';
-import Button from '../ui/Button';
+import Card from '../ui/card';
+import Button from '../ui/button';
 import { Badge } from '../ui/Badge';
 import Spinner from '../ui/Spinner';
 import Modal from '../ui/Modal';
-import Input from '../ui/Input';
+import { Input } from '../ui/Input';
 
 const WithdrawalRequests: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -32,37 +32,37 @@ const WithdrawalRequests: React.FC = () => {
   
   const handleSubmit = async () => {
     if (!selectedRequest || !action) return;
-    
+
     const status = 
       action === 'approve' ? 'approved' :
       action === 'reject' ? 'rejected' :
       action === 'complete' ? 'completed' : null;
-    
+
     if (!status) return;
-    
-    {withdrawalRequests.map((request) => (
-  <div key={request._id} className="request-item">
-    <p>{request.user.name} - {request.amount}</p>
-    <button
-      onClick={() =>
-        dispatch(processWithdrawalRequest({
-          requestId: request._id,
-          status: 'approved',
-          adminNotes: 'Processed manually'
-        }))
-      }
-    >
-      Approve
-    </button>
-  </div>
-))}
 
+    // For reject, require adminNotes
+    if (action === 'reject' && !adminNotes.trim()) {
+      alert('Please provide a rejection reason.');
+      return;
+    }
 
-    
+    await dispatch(processWithdrawalRequest({
+      requestId: selectedRequest,
+      status,
+      adminNotes: adminNotes.trim() || undefined,
+    }));
+    // Refresh list
+    dispatch(getWithdrawalRequests());
     setIsModalOpen(false);
     setSelectedRequest(null);
     setAction(null);
     setAdminNotes('');
+    // Show admin feedback
+    if (action === 'approve') {
+      alert('Withdrawal approved. User will be notified that funds will be sent within 2 days.');
+    } else if (action === 'reject') {
+      alert('Withdrawal rejected. User will be notified with the provided reason.');
+    }
   };
   
   const getActionTitle = () => {
@@ -77,7 +77,7 @@ const WithdrawalRequests: React.FC = () => {
       case 'pending':
         return <Badge variant="warning">Pending</Badge>;
       case 'approved':
-        return <Badge variant="info">Approved</Badge>;
+        return <Badge variant="primary">Approved</Badge>;
       case 'rejected':
         return <Badge variant="danger">Rejected</Badge>;
       case 'completed':
@@ -231,15 +231,23 @@ const WithdrawalRequests: React.FC = () => {
             {action === 'complete' && 'Are you sure you want to mark this withdrawal request as completed? This indicates that the funds have been sent to the user.'}
           </p>
           
-          <Input
-            label="Admin Notes"
-            type="text"
-            name="adminNotes"
-            id="adminNotes"
-            value={adminNotes}
-            onChange={(e) => setAdminNotes(e.target.value)}
-            placeholder="Add notes for this action (optional)"
-          />
+          {action === 'reject' && (
+            <div>
+              <label htmlFor="adminNotes" className="block text-sm font-medium text-gray-700">Rejection Reason</label>
+              <Input
+                id="adminNotes"
+                value={adminNotes}
+                onChange={e => setAdminNotes(e.target.value)}
+                placeholder="Enter reason for rejection"
+                required
+              />
+            </div>
+          )}
+          {action === 'approve' && (
+            <div className="text-green-700 bg-green-50 p-2 rounded">
+              Withdrawal approved. User will be notified that funds will be sent within 2 days.
+            </div>
+          )}
         </div>
       </Modal>
     </div>

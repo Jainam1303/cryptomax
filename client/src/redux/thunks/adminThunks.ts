@@ -48,7 +48,7 @@ export const getWithdrawalRequests = createAsyncThunk(
   'admin/getWithdrawalRequests',
   async (_, thunkAPI) => {
     try {
-      const res = await api.get('/api/admin/withdrawals');
+      const res = await api.get('/api/admin/withdrawal-requests');
       return res.data;
     } catch (err: any) {
       return thunkAPI.rejectWithValue('Failed to fetch withdrawal requests');
@@ -68,7 +68,7 @@ export const processWithdrawalRequest = createAsyncThunk(
     thunkAPI
   ) => {
     try {
-      const res = await api.put(`/api/admin/withdrawals/${requestId}`, {
+      const res = await api.put(`/api/admin/withdrawal-requests/${requestId}`, {
         status,
         adminNotes,
       });

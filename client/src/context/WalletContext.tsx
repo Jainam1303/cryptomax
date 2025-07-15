@@ -104,8 +104,8 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
         title: "Deposit Successful",
         description: `$${amount} has been deposited to your wallet`,
       });
-      
-      // Refresh transactions
+      // Refresh wallet and transactions
+      await getWallet();
       await getTransactions();
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Deposit failed';

@@ -17,13 +17,24 @@ export const loadUser = createAsyncThunk('auth/loadUser', async (_, thunkAPI) =>
 // ✅ Login User
 export const login = createAsyncThunk(
   'auth/loginUser',
-  async (credentials: { email: string; password: string }, thunkAPI) => {
+  async (credentials: { email: string; password: string; rememberMe?: boolean }, thunkAPI) => {
     try {
-      const res = await api.post('/api/auth/login', credentials);
+      const res = await api.post('/api/auth/login', {
+        email: credentials.email,
+        password: credentials.password
+      });
       const { token } = res.data;
 
       if (token) {
+        // Store token based on remember me preference
+        if (credentials.rememberMe) {
         localStorage.setItem('token', token);
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          sessionStorage.setItem('token', token);
+          localStorage.removeItem('rememberMe');
+        }
+        
         setAuthToken(token);
         thunkAPI.dispatch(loginSuccess({ token }));
         thunkAPI.dispatch(loadUser());
@@ -40,15 +51,27 @@ export const login = createAsyncThunk(
 export const register = createAsyncThunk(
   'auth/registerUser',
   async (
-    formData: { name: string; email: string; password: string },
+    formData: { name: string; email: string; password: string; rememberMe?: boolean },
     thunkAPI
   ) => {
     try {
-      const res = await api.post('/api/auth/register', formData);
+      const res = await api.post('/api/auth/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
       const { token } = res.data;
 
       if (token) {
+        // Store token based on remember me preference
+        if (formData.rememberMe) {
         localStorage.setItem('token', token);
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          sessionStorage.setItem('token', token);
+          localStorage.removeItem('rememberMe');
+        }
+        
         setAuthToken(token);
         thunkAPI.dispatch(loginSuccess({ token }));
         thunkAPI.dispatch(loadUser());
@@ -64,6 +87,8 @@ export const register = createAsyncThunk(
 // ✅ Logout
 export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, thunkAPI) => {
   localStorage.removeItem('token');
+  localStorage.removeItem('rememberMe');
+  sessionStorage.removeItem('token');
   setAuthToken(null);
   thunkAPI.dispatch(logout());
 });

@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getCryptos, updateCryptoSettings } from '../../redux/thunks/adminThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
-import Card from '../ui/Card';
-import Button from '../ui/Button';
-import Input from '../ui/Input';
+import Card from '../ui/card';
+import Button from '../ui/button';
+import { Input } from '../ui/Input';
 import Spinner from '../ui/Spinner';
 import Modal from '../ui/Modal';
-import Alert from '../ui/Alert';
+import { Alert } from '../ui/Alert';
 
 const SystemSettings: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

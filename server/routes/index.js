@@ -7,5 +7,6 @@ router.use('/api/wallet', require('./api/wallet'));
 router.use('/api/investments', require('./api/investments'));
 router.use('/api/crypto', require('./api/crypto'));
 router.use('/api/admin', require('./api/admin'));
+router.use('/api/cryptos', require('./api/cryptos'));
 
 module.exports = router;

@@ -8,6 +8,7 @@ import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Spinner from '../ui/Spinner';
 import Alert from '../ui/Alert';
+import { Input } from '../ui/Input';
 
 const InvestmentList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

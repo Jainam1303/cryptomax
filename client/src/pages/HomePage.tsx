@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import Card from '../components/ui/card';
 import { ArrowRight, TrendingUp, Shield, Zap, BarChart3, Wallet, Users } from 'lucide-react';
 
 const HomePage: React.FC = () => {
@@ -121,32 +121,28 @@ const HomePage: React.FC = () => {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 animate-pulse">
             <Card className="bg-black/40 border-purple-500/20 backdrop-blur-sm">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">₿</span>
-                  </div>
-                  <div>
-                    <p className="text-white text-sm font-medium">Bitcoin</p>
-                    <p className="text-green-400 text-xs">+5.2%</p>
-                  </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">₿</span>
                 </div>
-              </CardContent>
+                <div>
+                  <p className="text-white text-sm font-medium">Bitcoin</p>
+                  <p className="text-green-400 text-xs">+5.2%</p>
+                </div>
+              </div>
             </Card>
           </div>
           <div className="absolute top-40 right-10 animate-pulse delay-1000">
             <Card className="bg-black/40 border-blue-500/20 backdrop-blur-sm">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">Ξ</span>
-                  </div>
-                  <div>
-                    <p className="text-white text-sm font-medium">Ethereum</p>
-                    <p className="text-green-400 text-xs">+3.8%</p>
-                  </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">Ξ</span>
                 </div>
-              </CardContent>
+                <div>
+                  <p className="text-white text-sm font-medium">Ethereum</p>
+                  <p className="text-green-400 text-xs">+3.8%</p>
+                </div>
+              </div>
             </Card>
           </div>
         </div>
@@ -164,75 +160,63 @@ const HomePage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm hover:border-purple-500/50 transition-colors">
-              <CardHeader>
-                <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4">
-                  <BarChart3 className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle className="text-white">Real-time Analytics</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Advanced charts and analytics to track your portfolio performance in real-time
-                </CardDescription>
-              </CardHeader>
+              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4">
+                <BarChart3 className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white">Real-time Analytics</p>
+              <p className="text-gray-300">
+                Advanced charts and analytics to track your portfolio performance in real-time
+              </p>
             </Card>
 
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm hover:border-purple-500/50 transition-colors">
-              <CardHeader>
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
-                  <Wallet className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle className="text-white">Portfolio Management</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Comprehensive portfolio tracking with detailed insights and performance metrics
-                </CardDescription>
-              </CardHeader>
+              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
+                <Wallet className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white">Portfolio Management</p>
+              <p className="text-gray-300">
+                Comprehensive portfolio tracking with detailed insights and performance metrics
+              </p>
             </Card>
 
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm hover:border-purple-500/50 transition-colors">
-              <CardHeader>
-                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-4">
-                  <TrendingUp className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle className="text-white">Smart Alerts</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Get notified about price movements, market trends, and investment opportunities
-                </CardDescription>
-              </CardHeader>
+              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-4">
+                <TrendingUp className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white">Smart Alerts</p>
+              <p className="text-gray-300">
+                Get notified about price movements, market trends, and investment opportunities
+              </p>
             </Card>
 
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm hover:border-purple-500/50 transition-colors">
-              <CardHeader>
-                <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-4">
-                  <Shield className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle className="text-white">Secure Trading</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Bank-level security with encrypted transactions and secure wallet integration
-                </CardDescription>
-              </CardHeader>
+              <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-4">
+                <Shield className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white">Secure Trading</p>
+              <p className="text-gray-300">
+                Bank-level security with encrypted transactions and secure wallet integration
+              </p>
             </Card>
 
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm hover:border-purple-500/50 transition-colors">
-              <CardHeader>
-                <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center mb-4">
-                  <Zap className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle className="text-white">Lightning Fast</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Execute trades in milliseconds with our optimized trading engine
-                </CardDescription>
-              </CardHeader>
+              <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center mb-4">
+                <Zap className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white">Lightning Fast</p>
+              <p className="text-gray-300">
+                Execute trades in milliseconds with our optimized trading engine
+              </p>
             </Card>
 
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm hover:border-purple-500/50 transition-colors">
-              <CardHeader>
-                <div className="w-12 h-12 bg-pink-600 rounded-lg flex items-center justify-center mb-4">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle className="text-white">Community Insights</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Learn from experienced traders and share insights with the community
-                </CardDescription>
-              </CardHeader>
+              <div className="w-12 h-12 bg-pink-600 rounded-lg flex items-center justify-center mb-4">
+                <Users className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white">Community Insights</p>
+              <p className="text-gray-300">
+                Learn from experienced traders and share insights with the community
+              </p>
             </Card>
           </div>
         </div>

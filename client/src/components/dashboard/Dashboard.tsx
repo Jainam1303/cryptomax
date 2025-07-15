@@ -13,6 +13,7 @@ import PriceChart from './PriceChart';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import Spinner from '../ui/Spinner';
+import { Input } from '../ui/Input';
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,13 +22,13 @@ const Dashboard: React.FC = () => {
   const { portfolio, loading: portfolioLoading } = useSelector((state: RootState) => state.investment);
   const { cryptos, marketData, loading: cryptoLoading } = useSelector((state: RootState) => state.crypto);
   
-  useEffect(() => {
-    dispatch(getWallet());
-    dispatch(getTransactions());
-    dispatch(getPortfolio());
-    dispatch(getCryptos());
-    dispatch(getMarketData());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(getWallet());
+  //   dispatch(getTransactions());
+  //   dispatch(getPortfolio());
+  //   dispatch(getCryptos());
+  //   dispatch(getMarketData());
+  // }, [dispatch]);
   
   const isLoading = walletLoading || portfolioLoading || cryptoLoading;
   

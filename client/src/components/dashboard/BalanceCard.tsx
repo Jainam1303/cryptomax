@@ -5,6 +5,7 @@ import { formatCurrency } from '../../utils/formatters';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { Wallet as WalletType } from '../../types';
+import { Input } from '../ui/Input';
 
 interface BalanceCardProps {
   wallet: WalletType | null;

@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useToast } from '../hooks/use-toast';
 import api, { setAuthToken } from '../services/api';
+import { useDispatch } from 'react-redux';
+import { loginSuccess, userLoaded, logout as reduxLogout } from '../redux/slices/authSlice';
 
 interface User {
   _id: string;
@@ -39,12 +41,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
   // Load user on component mount
   useEffect(() => {
     const token = localStorage.getItem('token');
+    setAuthToken(token);
     if (token) {
-      setAuthToken(token);
       loadUser();
     } else {
       setLoading(false);
@@ -56,10 +59,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await api.get('/api/auth/user');
       setUser(response.data);
       setIsAuthenticated(true);
+      // Sync Redux
+      dispatch(userLoaded(response.data));
     } catch (error) {
       console.error('Error loading user:', error);
       localStorage.removeItem('token');
       setAuthToken(null);
+      // Sync Redux
+      dispatch(reduxLogout());
     } finally {
       setLoading(false);
     }
@@ -69,13 +76,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       setLoading(true);
       const response = await api.post('/api/auth/login', { email, password });
-      
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       setAuthToken(token);
       setUser(user);
       setIsAuthenticated(true);
-
+      // Sync Redux
+      dispatch(loginSuccess({ token }));
+      dispatch(userLoaded(user));
       toast({
         title: "Login Successful",
         description: `Welcome back, ${user.name}!`,
@@ -97,13 +105,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       setLoading(true);
       const response = await api.post('/api/auth/register', { name, email, password });
-      
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       setAuthToken(token);
       setUser(user);
       setIsAuthenticated(true);
-
+      // Sync Redux
+      dispatch(loginSuccess({ token }));
+      dispatch(userLoaded(user));
       toast({
         title: "Registration Successful",
         description: `Welcome to CryptoMax, ${user.name}!`,
@@ -126,7 +135,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setAuthToken(null);
     setUser(null);
     setIsAuthenticated(false);
-
+    // Sync Redux
+    dispatch(reduxLogout());
     toast({
       title: "Logged Out",
       description: "You have been successfully logged out.",

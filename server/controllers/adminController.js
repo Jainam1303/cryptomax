@@ -11,9 +11,13 @@ const Wallet = require('../models/Wallet');
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find().select('-password');
+    console.log('API /api/admin/users returned', users.length, 'users');
+    if (users.length > 0) {
+      console.log('First user:', users[0]);
+    }
     res.json(users);
   } catch (err) {
-    console.error('Admin get users error:', err.message);
+    console.error('Admin get users error:', err.message, err);
     res.status(500).json({ msg: 'Server error' });
   }
 };
@@ -29,7 +33,7 @@ exports.getWithdrawalRequests = async (req, res) => {
     
     res.json(withdrawalRequests);
   } catch (err) {
-    console.error('Admin get withdrawal requests error:', err.message);
+    console.error('Admin get withdrawal requests error:', err.message, err);
     res.status(500).json({ msg: 'Server error' });
   }
 };
@@ -89,7 +93,8 @@ exports.processWithdrawalRequest = async (req, res) => {
       await wallet.save();
       
       // Update transaction
-      transaction.status = 'cancelled';
+      transaction.status = 'failed';
+      transaction.failureReason = adminNotes || 'Rejected by admin';
       transaction.description += ' (Rejected by admin)';
       await transaction.save();
     } else if (status === 'completed') {
@@ -104,6 +109,7 @@ exports.processWithdrawalRequest = async (req, res) => {
       await transaction.save();
     } else if (status === 'approved') {
       // Only update transaction status
+      transaction.status = 'completed';
       transaction.description += ' (Approved by admin)';
       await transaction.save();
     }
@@ -246,7 +252,22 @@ exports.getDashboardData = async (req, res) => {
       recentTransactions
     });
   } catch (err) {
-    console.error('Get admin dashboard data error:', err.message);
+    console.error('Get admin dashboard data error:', err.message, err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// @route   GET api/admin/investments
+// @desc    Get all investments (admin)
+// @access  Private/Admin
+exports.getInvestments = async (req, res) => {
+  try {
+    const investments = await Investment.find()
+      .populate('user', 'name email')
+      .populate('crypto', 'name symbol image');
+    res.json(investments);
+  } catch (err) {
+    console.error('Admin get investments error:', err.message);
     res.status(500).json({ msg: 'Server error' });
   }
 };

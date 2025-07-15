@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { isValidEmail } from '../../utils/validators';
 import Card from '../ui/Card';
-import Input from '../ui/Input';
+import { Input } from '../ui/Input';
 import Button from '../ui/Button';
 import Alert from '../ui/Alert';
 

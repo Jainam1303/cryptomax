@@ -32,6 +32,10 @@ const TransactionSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  failureReason: {
+    type: String,
+    default: ''
+  },
   createdAt: {
     type: Date,
     default: Date.now

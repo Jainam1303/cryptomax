@@ -8,14 +8,33 @@ interface AuthState {
   loading: boolean;
   user: any;
   error: string | null;
+  rememberMe: boolean;
 }
 
+// Helper function to get token from storage
+const getStoredToken = (): string | null => {
+  // Check localStorage first (remember me)
+  const localToken = localStorage.getItem('token');
+  if (localToken) {
+    return localToken;
+  }
+  
+  // Check sessionStorage (temporary session)
+  const sessionToken = sessionStorage.getItem('token');
+  if (sessionToken) {
+    return sessionToken;
+  }
+  
+  return null;
+};
+
 const initialState: AuthState = {
-  token: localStorage.getItem('token'),
+  token: getStoredToken(),
   isAuthenticated: false,
   loading: false,
   user: null,
-  error: null
+  error: null,
+  rememberMe: localStorage.getItem('rememberMe') === 'true'
 };
 
 const authSlice = createSlice({
@@ -40,9 +59,13 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.loading = false;
       state.error = null;
+      state.rememberMe = false;
     },
     clearError: (state) => {
       state.error = null;
+    },
+    setRememberMe: (state, action: PayloadAction<boolean>) => {
+      state.rememberMe = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -108,5 +131,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginSuccess, userLoaded, logout, clearError } = authSlice.actions;
+export const { loginSuccess, userLoaded, logout, clearError, setRememberMe } = authSlice.actions;
 export default authSlice.reducer;

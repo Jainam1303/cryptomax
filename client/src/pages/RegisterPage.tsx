@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Button from "@/components/ui/button";
+import Card from "@/components/ui/card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { User, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
@@ -58,14 +58,11 @@ const RegisterPage = () => {
         </div>
 
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
-            <CardDescription>
-              Start your crypto investment journey today
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="space-y-4">
+          <div className="space-y-1 text-center px-6 pt-6">
+            <h2 className="text-2xl font-bold">Create your account</h2>
+            <p className="text-gray-600">Start your crypto investment journey today</p>
+          </div>
+          <div className="space-y-4 px-6 pb-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fullName">Full Name</Label>
@@ -200,7 +197,7 @@ const RegisterPage = () => {
                 Sign in
               </Link>
             </div>
-          </CardContent>
+          </div>
         </Card>
       </div>
     </div>

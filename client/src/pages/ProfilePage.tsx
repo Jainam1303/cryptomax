@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateProfile } from '../redux/thunks/authThunks';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import Input from '../components/ui/Input';
-import Alert from '../components/ui/Alert';
+import Card from '../components/ui/card';
+import Button from '../components/ui/button';
+import { Input } from '../components/ui/Input';
+import { Alert } from '../components/ui/Alert';
 import Sidebar from '../components/common/Sidebar';
 import { RootState, AppDispatch } from '../redux/store';
 
@@ -157,19 +157,15 @@ const ProfilePage: React.FC = () => {
           
           <Card>
             {success && (
-              <Alert
-                variant="success"
-                message={success}
-                className="mb-6"
-              />
+              <Alert variant="default" className="mb-6">
+                {success}
+              </Alert>
             )}
             
             {error && (
-              <Alert
-                variant="danger"
-                message={error}
-                className="mb-6"
-              />
+              <Alert variant="destructive" className="mb-6">
+                {error}
+              </Alert>
             )}
             
             <form onSubmit={handleSubmit}>
@@ -180,19 +176,19 @@ const ProfilePage: React.FC = () => {
                   </h3>
                   
                   <div className="space-y-4">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
                     <Input
-                      label="Full Name"
                       type="text"
                       name="name"
                       id="name"
                       value={formData.name}
                       onChange={handleChange}
-                      error={formErrors.name}
                       required
                     />
+                    {formErrors.name && <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>}
                     
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
                     <Input
-                      label="Email Address"
                       type="email"
                       name="email"
                       id="email"
@@ -208,51 +204,47 @@ const ProfilePage: React.FC = () => {
                   </h3>
                   
                   <div className="space-y-4">
+                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
                     <Input
-                      label="Current Password"
                       type="password"
                       name="currentPassword"
                       id="currentPassword"
                       value={formData.currentPassword}
                       onChange={handleChange}
-                      error={formErrors.currentPassword}
                     />
+                    {formErrors.currentPassword && <p className="text-red-500 text-xs mt-1">{formErrors.currentPassword}</p>}
                     
+                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
                     <Input
-                      label="New Password"
                       type="password"
                       name="newPassword"
                       id="newPassword"
                       value={formData.newPassword}
                       onChange={handleChange}
-                      error={formErrors.newPassword}
                     />
+                    {formErrors.newPassword && <p className="text-red-500 text-xs mt-1">{formErrors.newPassword}</p>}
                     
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
                     <Input
-                      label="Confirm New Password"
                       type="password"
                       name="confirmPassword"
                       id="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      error={formErrors.confirmPassword}
                     />
-                    
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Leave password fields empty if you don't want to change your password.
-                    </p>
+                    {formErrors.confirmPassword && <p className="text-red-500 text-xs mt-1">{formErrors.confirmPassword}</p>}
                   </div>
                 </div>
                 
                 <div className="flex justify-end">
-                                      <Button
-                      type="submit"
-                      variant="default"
-                      disabled={loading}
-                      className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50"
-                    >
-                      {loading ? 'Saving...' : 'Save Changes'}
-                    </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    disabled={loading}
+                    className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50"
+                  >
+                    {loading ? 'Saving...' : 'Save Changes'}
+                  </Button>
                 </div>
               </div>
             </form>

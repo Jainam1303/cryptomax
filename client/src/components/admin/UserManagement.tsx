@@ -4,8 +4,8 @@ import { Search, User, Mail, Calendar, Clock } from 'lucide-react';
 import { getUsers } from '../../redux/thunks/adminThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { formatDate } from '../../utils/formatters';
-import Card from '../ui/Card';
-import Input from '../ui/Input';
+import Card from '../ui/card';
+import { Input } from '../ui/Input';
 import { Badge } from '../ui/Badge';
 import Spinner from '../ui/Spinner';
 
@@ -47,13 +47,18 @@ const UserManagement: React.FC = () => {
     <div className="space-y-6">
       <Card>
         <div className="mb-6">
-          <Input
-            type="text"
-            placeholder="Search users by name or email..."
-            value={searchTerm}
-            onChange={handleSearch}
-            leftIcon={<Search className="h-5 w-5 text-gray-400" />}
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2">
+              <Search className="h-5 w-5 text-gray-400" />
+            </span>
+            <Input
+              type="text"
+              placeholder="Search users by name or email..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="pl-10"
+            />
+          </div>
         </div>
         
         {filteredUsers?.length === 0 ? (

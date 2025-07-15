@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useToast } from '../hooks/use-toast';
 import api from '../services/api';
 
@@ -38,6 +38,8 @@ interface PriceHistoryItem {
 
 interface CryptoContextType {
   cryptos: Crypto[];
+  tickerCryptos: Crypto[];
+  lastUpdated: Date | null;
   marketData: MarketData | null;
   selectedCrypto: Crypto | null;
   priceHistory: PriceHistoryItem[];
@@ -67,6 +69,8 @@ interface CryptoProviderProps {
 
 export const CryptoProvider = ({ children }: CryptoProviderProps) => {
   const [cryptos, setCryptos] = useState<Crypto[]>([]);
+  const [tickerCryptos, setTickerCryptos] = useState<Crypto[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [marketData, setMarketData] = useState<MarketData | null>(null);
   const [selectedCrypto, setSelectedCrypto] = useState<Crypto | null>(null);
   const [priceHistory, setPriceHistory] = useState<PriceHistoryItem[]>([]);
@@ -85,6 +89,8 @@ export const CryptoProvider = ({ children }: CryptoProviderProps) => {
       setLoading(true);
       const response = await api.get('/api/crypto');
       setCryptos(response.data);
+      setTickerCryptos(response.data);
+      setLastUpdated(new Date());
     } catch (error: any) {
       console.error('Error fetching cryptos:', error);
       toast({
@@ -150,6 +156,8 @@ export const CryptoProvider = ({ children }: CryptoProviderProps) => {
 
   const value: CryptoContextType = {
     cryptos,
+    tickerCryptos,
+    lastUpdated,
     marketData,
     selectedCrypto,
     priceHistory,

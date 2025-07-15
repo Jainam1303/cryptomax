@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import Card from "@/components/ui/card";
+import Button from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Wallet, Plus, Minus, ArrowLeft, TrendingUp, TrendingDown, DollarSign, Loader2 } from "lucide-react";
 import { useWallet } from '../context/WalletContext';
 import { useAuth } from '../context/AuthContext';
@@ -52,6 +52,12 @@ const WalletPage = () => {
     }
   };
 
+  // Add a unified refresh handler
+  const handleRefresh = () => {
+    getTransactions();
+    getWallet();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Navigation */}
@@ -93,55 +99,55 @@ const WalletPage = () => {
         {/* Wallet Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Available Balance</CardTitle>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6">
+              <span className="text-sm font-medium text-gray-600">Available Balance</span>
               <DollarSign className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
+            </div>
+            <div className="px-6 pb-6">
               <div className="text-2xl font-bold text-gray-900">
                 ${wallet?.balance?.toLocaleString() || '0.00'}
               </div>
               <p className="text-xs text-gray-600 mt-1">Ready to invest</p>
-            </CardContent>
+            </div>
           </Card>
 
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Deposited</CardTitle>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6">
+              <span className="text-sm font-medium text-gray-600">Total Deposited</span>
               <TrendingUp className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
+            </div>
+            <div className="px-6 pb-6">
               <div className="text-2xl font-bold text-green-600">
                 ${wallet?.totalDeposited?.toLocaleString() || '0.00'}
               </div>
               <p className="text-xs text-gray-600 mt-1">All time deposits</p>
-            </CardContent>
+            </div>
           </Card>
 
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Withdrawn</CardTitle>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6">
+              <span className="text-sm font-medium text-gray-600">Total Withdrawn</span>
               <TrendingDown className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
+            </div>
+            <div className="px-6 pb-6">
               <div className="text-2xl font-bold text-red-600">
                 ${wallet?.totalWithdrawn?.toLocaleString() || '0.00'}
               </div>
               <p className="text-xs text-gray-600 mt-1">All time withdrawals</p>
-            </CardContent>
+            </div>
           </Card>
 
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Pending</CardTitle>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6">
+              <span className="text-sm font-medium text-gray-600">Pending</span>
               <Wallet className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
+            </div>
+            <div className="px-6 pb-6">
               <div className="text-2xl font-bold text-yellow-600">
                 ${(wallet?.pendingDeposits || 0) + (wallet?.pendingWithdrawals || 0)}
               </div>
               <p className="text-xs text-gray-600 mt-1">Pending transactions</p>
-            </CardContent>
+            </div>
           </Card>
         </div>
 
@@ -273,32 +279,61 @@ const WalletPage = () => {
 
         {/* Recent Transactions */}
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center justify-between">
               Recent Transactions
               <Link to="/transactions">
                 <Button variant="outline" size="sm">View All</Button>
               </Link>
-            </CardTitle>
-            <CardDescription>Your latest wallet transactions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {transactions.length > 0 ? (
-                transactions.slice(0, 10).map((transaction, index) => (
+            </span>
+            <Button variant="outline" size="sm" onClick={handleRefresh} className="ml-2">Refresh</Button>
+          </div>
+          <div className="space-y-4">
+            {transactions.length > 0 ? (
+              transactions.slice(0, 10).map((transaction, index) => {
+                // Icon, color, and sign logic
+                let icon, iconBg, amountColor, sign;
+                switch (transaction.type) {
+                  case 'deposit':
+                    icon = <TrendingUp className="w-4 h-4 text-green-600" />;
+                    iconBg = 'bg-green-100';
+                    amountColor = 'text-green-600';
+                    sign = '+';
+                    break;
+                  case 'withdrawal':
+                  case 'investment':
+                    icon = <TrendingDown className="w-4 h-4 text-red-600" />;
+                    iconBg = 'bg-red-100';
+                    amountColor = 'text-red-600';
+                    sign = '-';
+                    break;
+                  case 'profit':
+                    icon = <TrendingUp className="w-4 h-4 text-green-600" />;
+                    iconBg = 'bg-green-100';
+                    amountColor = 'text-green-600';
+                    sign = '+';
+                    break;
+                  case 'loss':
+                    icon = <TrendingDown className="w-4 h-4 text-red-600" />;
+                    iconBg = 'bg-red-100';
+                    amountColor = 'text-red-600';
+                    sign = '-';
+                    break;
+                  default:
+                    icon = <TrendingDown className="w-4 h-4 text-gray-400" />;
+                    iconBg = 'bg-gray-100';
+                    amountColor = 'text-gray-600';
+                    sign = '';
+                }
+                return (
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        transaction.type === 'deposit' ? 'bg-green-100' : 'bg-red-100'
-                      }`}>
-                        {transaction.type === 'deposit' ? 
-                          <TrendingUp className="w-4 h-4 text-green-600" /> :
-                          <TrendingDown className="w-4 h-4 text-red-600" />
-                        }
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${iconBg}`}>
+                        {icon}
                       </div>
                       <div>
                         <div className="font-semibold text-gray-900 capitalize">
-                          {transaction.type}
+                          {transaction.type === 'profit' ? 'Profit' : transaction.type === 'loss' ? 'Loss' : transaction.type}
                         </div>
                         <div className="text-sm text-gray-500">
                           {new Date(transaction.createdAt).toLocaleDateString()}
@@ -306,24 +341,22 @@ const WalletPage = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`font-semibold ${
-                        transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toLocaleString()}
+                      <div className={`font-semibold ${amountColor}`}>
+                        {sign}${(transaction.amount ?? 0).toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-500 capitalize">
                         {transaction.status}
                       </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <p>No transactions yet. Make your first deposit to get started!</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
+                );
+              })
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>No transactions yet. Make your first deposit to get started!</p>
+              </div>
+            )}
+          </div>
         </Card>
       </div>
     </div>

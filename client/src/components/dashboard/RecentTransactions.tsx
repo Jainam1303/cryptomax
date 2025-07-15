@@ -69,31 +69,40 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ transactions })
   
   return (
     <div className="space-y-4">
-      {transactions.map((transaction) => (
-        <div key={transaction._id} className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 mr-3">
-              {getTransactionIcon(transaction.type)}
+      {transactions.map((transaction) => {
+        const isProfit = transaction.type === 'profit';
+        const isLoss = transaction.type === 'loss';
+        const amountDisplay = isProfit
+          ? `+${formatCurrency(transaction.amount)}`
+          : isLoss
+            ? `-${formatCurrency(transaction.amount)}`
+            : formatCurrency(transaction.amount);
+        return (
+          <div key={transaction._id} className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 mr-3">
+                {getTransactionIcon(transaction.type)}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {getTransactionText(transaction)}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {formatDate(transaction.createdAt, true)}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                {getTransactionText(transaction)}
+            <div className="text-right">
+              <p className={`text-sm font-medium ${isProfit ? 'text-green-600' : isLoss ? 'text-red-600' : 'text-gray-900'} dark:text-white`}>
+                {amountDisplay}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {formatDate(transaction.createdAt, true)}
-              </p>
+              <div className="mt-1">
+                {getStatusBadge(transaction.status)}
+              </div>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {formatCurrency(transaction.amount)}
-            </p>
-            <div className="mt-1">
-              {getStatusBadge(transaction.status)}
-            </div>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

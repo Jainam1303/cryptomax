@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import Card from "@/components/ui/card";
+import Button from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/Badge";
@@ -64,9 +64,11 @@ const TransactionsPage = () => {
     switch (type.toLowerCase()) {
       case 'deposit':
       case 'sale':
+      case 'profit':
         return 'text-green-600';
       case 'withdrawal':
       case 'investment':
+      case 'loss':
         return 'text-red-600';
       default:
         return 'text-gray-900';
@@ -113,151 +115,165 @@ const TransactionsPage = () => {
 
         {/* Filters */}
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center">
+          <div className="flex items-center justify-between p-4">
+            <h3 className="text-sm font-medium text-gray-600">
               <Filter className="w-5 h-5 mr-2" />
               Filters & Search
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search transactions..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-
-              {/* Type Filter */}
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Transaction Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="deposit">Deposits</SelectItem>
-                  <SelectItem value="withdrawal">Withdrawals</SelectItem>
-                  <SelectItem value="investment">Investments</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Status Filter */}
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="failed">Failed</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Clear Filters */}
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setSearchTerm('');
-                  setFilterType('all');
-                  setFilterStatus('all');
-                }}
-              >
-                Clear Filters
-              </Button>
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search transactions..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-          </CardContent>
+
+            {/* Type Filter */}
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Transaction Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="deposit">Deposits</SelectItem>
+                <SelectItem value="withdrawal">Withdrawals</SelectItem>
+                <SelectItem value="investment">Investments</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Status Filter */}
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Clear Filters */}
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setSearchTerm('');
+                setFilterType('all');
+                setFilterStatus('all');
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
         </Card>
 
         {/* Transaction Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Transactions</CardTitle>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <h3 className="text-sm font-medium text-gray-600">Total Transactions</h3>
               <Wallet className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">
-                {filteredTransactions.length}
-              </div>
-              <p className="text-xs text-gray-600 mt-1">
-                {filteredTransactions.length !== transactions.length && `Filtered from ${transactions.length}`}
-              </p>
-            </CardContent>
+            </div>
+            <div className="text-2xl font-bold text-gray-900">
+              {filteredTransactions.length}
+            </div>
+            <p className="text-xs text-gray-600 mt-1">
+              {filteredTransactions.length !== transactions.length && `Filtered from ${transactions.length}`}
+            </p>
           </Card>
 
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Deposited</CardTitle>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <h3 className="text-sm font-medium text-gray-600">Total Deposited</h3>
               <TrendingUp className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                ${filteredTransactions
-                  .filter(t => t.type === 'deposit' && t.status === 'completed')
-                  .reduce((sum, t) => sum + t.amount, 0)
-                  .toLocaleString()}
-              </div>
-              <p className="text-xs text-gray-600 mt-1">Completed deposits</p>
-            </CardContent>
+            </div>
+            <div className="text-2xl font-bold text-green-600">
+              ${filteredTransactions
+                .filter(t => t.type === 'deposit' && t.status === 'completed')
+                .reduce((sum, t) => sum + t.amount, 0)
+                .toLocaleString()}
+            </div>
+            <p className="text-xs text-gray-600 mt-1">Completed deposits</p>
           </Card>
 
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Withdrawn</CardTitle>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <h3 className="text-sm font-medium text-gray-600">Total Withdrawn</h3>
               <TrendingDown className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">
-                ${filteredTransactions
-                  .filter(t => t.type === 'withdrawal' && t.status === 'completed')
-                  .reduce((sum, t) => sum + t.amount, 0)
-                  .toLocaleString()}
-              </div>
-              <p className="text-xs text-gray-600 mt-1">Completed withdrawals</p>
-            </CardContent>
+            </div>
+            <div className="text-2xl font-bold text-red-600">
+              ${filteredTransactions
+                .filter(t => t.type === 'withdrawal' && t.status === 'completed')
+                .reduce((sum, t) => sum + t.amount, 0)
+                .toLocaleString()}
+            </div>
+            <p className="text-xs text-gray-600 mt-1">Completed withdrawals</p>
           </Card>
         </div>
 
         {/* Transactions List */}
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle>Transaction History</CardTitle>
-            <CardDescription>
-              {filteredTransactions.length > 0 ? 
-                `Showing ${filteredTransactions.length} transactions` :
-                'No transactions found'
-              }
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">Transaction History</h3>
+          <div className="overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               </div>
             ) : filteredTransactions.length > 0 ? (
-              <div className="space-y-4">
-                {filteredTransactions.map((transaction, index) => (
-                  <div key={transaction._id || index} className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border-2 border-gray-200">
-                        {getTransactionIcon(transaction.type)}
-                      </div>
-                      <div>
-                        <div className="font-semibold text-gray-900 capitalize">
-                          {transaction.type}
-                          {transaction.description && (
-                            <span className="font-normal text-gray-500 ml-2">
-                              - {transaction.description}
-                            </span>
-                          )}
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-muted/50 border-b">
+                    <th className="py-4 px-6 font-medium text-sm text-muted-foreground text-left" style={{width: '40%'}}>Transaction</th>
+                    <th className="py-4 px-6 font-medium text-sm text-muted-foreground text-left" style={{width: '25%'}}>Date</th>
+                    <th className="py-4 px-6 font-medium text-sm text-muted-foreground text-right" style={{width: '20%'}}>Amount</th>
+                    <th className="py-4 px-6 font-medium text-sm text-muted-foreground text-center" style={{width: '15%'}}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTransactions.map((transaction, index) => (
+                    <tr key={transaction._id || index} className="hover:bg-muted/30 transition-colors">
+                      {/* Transaction column */}
+                      <td className="py-4 px-6 text-left">
+                        <div className="flex items-center gap-4">
+                          <div className={`flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full
+                            ${['profit', 'deposit'].includes(transaction.type) ? 'bg-success-bg' : ''}
+                            ${['withdrawal', 'loss', 'investment'].includes(transaction.type) ? 'bg-danger-bg' : ''}
+                            ${!['profit', 'deposit', 'withdrawal', 'loss', 'investment'].includes(transaction.type) ? 'bg-muted' : ''}
+                          `}>
+                            {getTransactionIcon(transaction.type)}
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-foreground capitalize">
+                              {transaction.type}
+                              {transaction.description && (
+                                <span className="font-normal text-muted-foreground ml-2">
+                                  - {transaction.description}
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-xs text-muted-foreground font-mono">
+                              {transaction.reference && (
+                                <>Ref: {transaction.reference}</>
+                              )}
+                            </div>
+                            {transaction.type === 'withdrawal' && transaction.status === 'failed' && (transaction as any).failureReason && (
+                              <div className="text-xs text-danger mt-1 font-medium">
+                                {(transaction as any).failureReason}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {new Date(transaction.createdAt).toLocaleDateString('en-US', {
+                      </td>
+                      {/* Date column */}
+                      <td className="py-4 px-6 text-left">
+                        <div className="text-sm text-foreground font-mono">
+                          {new Date(transaction.createdAt).toLocaleString('en-US', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',
@@ -265,34 +281,28 @@ const TransactionsPage = () => {
                             minute: '2-digit'
                           })}
                         </div>
-                        {transaction.reference && (
-                          <div className="text-xs text-gray-400">
-                            Ref: {transaction.reference}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="text-center">
-                      <div className={`font-semibold ${getAmountColor(transaction.type)}`}>
-                        {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toLocaleString()}
-                      </div>
-                      <div className="text-sm text-gray-500">{transaction.currency}</div>
-                    </div>
-                    
-                    <div className="text-right">
-                      <Badge className={getStatusColor(transaction.status)}>
-                        {transaction.status}
-                      </Badge>
-                      {transaction.completedAt && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          Completed: {new Date(transaction.completedAt).toLocaleDateString()}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                      </td>
+                      {/* Amount column */}
+                      <td className="py-4 px-6 text-right">
+                        <div className={`text-sm font-medium font-mono ${getAmountColor(transaction.type)}`}>{
+                          transaction.type === 'deposit' || transaction.type === 'profit'
+                            ? `+${(transaction.amount ?? 0).toLocaleString()}`
+                            : transaction.type === 'loss' || transaction.type === 'withdrawal' || transaction.type === 'investment'
+                              ? `-${(transaction.amount ?? 0).toLocaleString()}`
+                              : (transaction.amount ?? 0).toLocaleString()
+                        }</div>
+                        <div className="text-xs text-muted-foreground">{transaction.currency}</div>
+                      </td>
+                      {/* Status column */}
+                      <td className="py-4 px-6 text-center">
+                        <Badge className={getStatusColor(transaction.status)}>
+                          {transaction.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             ) : (
               <div className="text-center py-12">
                 <Wallet className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -312,7 +322,7 @@ const TransactionsPage = () => {
                 )}
               </div>
             )}
-          </CardContent>
+          </div>
         </Card>
       </div>
     </div>

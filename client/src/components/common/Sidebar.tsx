@@ -1,8 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { X, Home, TrendingUp, Wallet, User, Settings } from 'lucide-react';
-import { RootState } from '../../redux/store';
+import { Home, Users, DollarSign, ArrowDownCircle, User } from 'lucide-react';
 import clsx from 'clsx';
 
 interface SidebarProps {
@@ -11,8 +9,6 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
-  const { user } = useSelector((state: RootState) => state.auth);
-  
   return (
     <>
       {/* Overlay */}
@@ -22,7 +18,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           onClick={toggleSidebar}
         ></div>
       )}
-      
       {/* Sidebar */}
       <div 
         className={clsx(
@@ -36,29 +31,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             onClick={toggleSidebar}
             className="p-1 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-300 lg:hidden"
           >
-            <X className="h-6 w-6" />
+            <span className="sr-only">Close sidebar</span>
+            {/* X icon can be added here if desired */}
           </button>
         </div>
-        
         <div className="px-4 py-6">
           <nav className="space-y-1">
-            <SidebarLink to="/dashboard" icon={<Home className="h-5 w-5" />}>
-              Dashboard
-            </SidebarLink>
-            <SidebarLink to="/invest" icon={<TrendingUp className="h-5 w-5" />}>
-              Invest
-            </SidebarLink>
-            <SidebarLink to="/wallet" icon={<Wallet className="h-5 w-5" />}>
-              Wallet
-            </SidebarLink>
-            <SidebarLink to="/profile" icon={<User className="h-5 w-5" />}>
-              Profile
-            </SidebarLink>
-            {user?.role === 'admin' && (
-              <SidebarLink to="/admin" icon={<Settings className="h-5 w-5" />}>
-                Admin
-              </SidebarLink>
-            )}
+            <SidebarLink to="/dashboard" icon={<Home className="h-5 w-5" />}>Dashboard</SidebarLink>
+            <SidebarLink to="/admin/users" icon={<Users className="h-5 w-5" />}>Users</SidebarLink>
+            <SidebarLink to="/admin/deposits" icon={<DollarSign className="h-5 w-5" />}>Deposits</SidebarLink>
+            <SidebarLink to="/admin/withdrawals" icon={<ArrowDownCircle className="h-5 w-5" />}>Withdrawals</SidebarLink>
+            <SidebarLink to="/admin/profit-loss" icon={<DollarSign className="h-5 w-5" />}>Profit/Loss Change</SidebarLink>
+            <SidebarLink to="/admin/cryptos" icon={<DollarSign className="h-5 w-5" />}>Crypto Settings</SidebarLink>
           </nav>
         </div>
       </div>

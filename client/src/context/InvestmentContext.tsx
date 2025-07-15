@@ -40,7 +40,7 @@ interface InvestmentContextType {
   getInvestments: () => Promise<void>;
   getPortfolio: () => Promise<void>;
   buyInvestment: (cryptoId: string, amount: number) => Promise<void>;
-  sellInvestment: (investmentId: string) => Promise<void>;
+  sellInvestment: (investmentId: string, sellPrice?: number) => Promise<void>;
 }
 
 const InvestmentContext = createContext<InvestmentContextType | undefined>(undefined);
@@ -126,16 +126,14 @@ export const InvestmentProvider = ({ children }: InvestmentProviderProps) => {
     }
   };
 
-  const sellInvestment = async (investmentId: string) => {
+  const sellInvestment = async (investmentId: string, sellPrice?: number) => {
     try {
       setLoading(true);
-      const response = await api.put(`/api/investments/${investmentId}/sell`);
-      
+      const response = await api.put(`/api/investments/${investmentId}/sell`, sellPrice !== undefined ? { sellPrice } : {});
       toast({
         title: "Investment Sold",
         description: "Successfully sold your investment",
       });
-      
       // Refresh data
       await getInvestments();
       await getPortfolio();

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Button from "@/components/ui/button";
+import Card from "@/components/ui/card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
@@ -43,14 +43,11 @@ const LoginPage = () => {
         </div>
 
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-            <CardDescription>
-              Sign in to your account to continue investing
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="space-y-4">
+          <div className="space-y-1 text-center px-6 pt-6">
+            <h2 className="text-2xl font-bold">Welcome back</h2>
+            <p className="text-gray-600">Sign in to your account to continue investing</p>
+          </div>
+          <div className="space-y-4 px-6 pb-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -67,7 +64,6 @@ const LoginPage = () => {
                   />
                 </div>
               </div>
-              
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -90,7 +86,6 @@ const LoginPage = () => {
                   </button>
                 </div>
               </div>
-              
               <div className="flex items-center justify-between">
                 <label className="flex items-center space-x-2 text-sm">
                   <input type="checkbox" className="rounded border-gray-300" />
@@ -100,7 +95,6 @@ const LoginPage = () => {
                   Forgot password?
                 </Link>
               </div>
-              
               <Button 
                 type="submit" 
                 disabled={loading}
@@ -116,7 +110,6 @@ const LoginPage = () => {
                 )}
               </Button>
             </form>
-            
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
@@ -125,7 +118,6 @@ const LoginPage = () => {
                 <span className="px-2 bg-white text-gray-500">Or continue with</span>
               </div>
             </div>
-            
             <Button variant="outline" className="w-full">
               <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -135,14 +127,13 @@ const LoginPage = () => {
               </svg>
               Continue with Google
             </Button>
-            
             <div className="text-center text-sm">
               <span className="text-gray-600">Don't have an account? </span>
               <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
                 Sign up
               </Link>
             </div>
-          </CardContent>
+          </div>
         </Card>
       </div>
     </div>

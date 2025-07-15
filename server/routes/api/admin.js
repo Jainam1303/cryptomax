@@ -11,12 +11,12 @@ router.use(admin);
 // @route   GET api/admin/users
 // @desc    Get all users
 // @access  Private/Admin
-router.get('/users', adminController.getUsers);
+router.get('/users', (req, res, next) => { console.log('GET /api/admin/users'); next(); }, adminController.getUsers);
 
 // @route   GET api/admin/withdrawal-requests
 // @desc    Get all withdrawal requests
 // @access  Private/Admin
-router.get('/withdrawal-requests', adminController.getWithdrawalRequests);
+router.get('/withdrawal-requests', (req, res, next) => { console.log('GET /api/admin/withdrawal-requests'); next(); }, adminController.getWithdrawalRequests);
 
 // @route   PUT api/admin/withdrawal-requests/:id
 // @desc    Process withdrawal request
@@ -33,9 +33,14 @@ router.put('/crypto/:id', adminController.updateCryptoSettings);
 // @access  Private/Admin
 router.put('/investments/:id/adjust', adminController.adjustInvestment);
 
+// @route   GET api/admin/investments
+// @desc    Get all investments (admin)
+// @access  Private/Admin
+router.get('/investments', (req, res, next) => { console.log('GET /api/admin/investments'); next(); }, adminController.getInvestments);
+
 // @route   GET api/admin/dashboard
 // @desc    Get admin dashboard data
 // @access  Private/Admin
-router.get('/dashboard', adminController.getDashboardData);
+router.get('/dashboard', (req, res, next) => { console.log('GET /api/admin/dashboard'); next(); }, adminController.getDashboardData);
 
 module.exports = router;

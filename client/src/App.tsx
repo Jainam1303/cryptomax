@@ -61,7 +61,7 @@ const App = () => (
                       <TransactionsPage />
                     </ProtectedRoute>
                   } />
-                  <Route path="/admin" element={
+                  <Route path="/admin/*" element={
                     <AdminRoute>
                       <AdminPage />
                     </AdminRoute>

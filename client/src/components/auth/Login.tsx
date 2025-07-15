@@ -5,10 +5,10 @@ import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { login } from '../../redux/thunks/authThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { isValidEmail } from '../../utils/validators';
-import Card from '../ui/Card';
-import Input from '../ui/Input';
-import Button from '../ui/Button';
-import Alert from '../ui/Alert';
+import Card from '../ui/card';
+import { Input } from '../ui/Input';
+import Button from '../ui/button';
+import { Alert, AlertTitle, AlertDescription } from '../ui/Alert';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -19,6 +19,8 @@ const Login: React.FC = () => {
     email: '',
     password: ''
   });
+  
+  const [rememberMe, setRememberMe] = useState(false);
   
   const [formErrors, setFormErrors] = useState({
     email: '',
@@ -33,6 +35,10 @@ const Login: React.FC = () => {
     if (formErrors[name as keyof typeof formErrors]) {
       setFormErrors({ ...formErrors, [name]: '' });
     }
+  };
+  
+  const handleRememberMeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRememberMe(e.target.checked);
   };
   
   const validateForm = () => {
@@ -59,7 +65,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     
     if (validateForm()) {
-      const resultAction = await dispatch(login(formData));
+      const resultAction = await dispatch(login({ ...formData, rememberMe }));
       if (login.fulfilled.match(resultAction)) {
         navigate('/dashboard');
       }
@@ -77,39 +83,69 @@ const Login: React.FC = () => {
       
       <Card>
         {error && (
-          <Alert
-            variant="danger"
-            message={error}
-            className="mb-4"
-          />
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
         
         <form onSubmit={handleSubmit}>
-          <Input
-            label="Email address"
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email address
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
             type="email"
             name="email"
             id="email"
             value={formData.email}
             onChange={handleChange}
             placeholder="you@example.com"
-            error={formErrors.email}
-            leftIcon={<Mail className="h-5 w-5 text-gray-400" />}
+                className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                  formErrors.email 
+                    ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                }`}
             required
           />
+            </div>
+            {formErrors.email && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+            )}
+          </div>
           
-          <Input
-            label="Password"
+          <div className="mb-4">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
             type="password"
             name="password"
             id="password"
             value={formData.password}
             onChange={handleChange}
             placeholder="••••••••"
-            error={formErrors.password}
-            leftIcon={<Lock className="h-5 w-5 text-gray-400" />}
+                className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                  formErrors.password 
+                    ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                }`}
             required
           />
+            </div>
+            {formErrors.password && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+            )}
+          </div>
           
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
@@ -117,6 +153,8 @@ const Login: React.FC = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
+                checked={rememberMe}
+                onChange={handleRememberMeChange}
                 className="h-4 w-4 text-primary-500 focus:ring-primary-500 border-gray-300 rounded"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">

@@ -121,22 +121,16 @@ exports.requestWithdrawal = async (req, res) => {
 // @access  Private
 exports.getTransactions = async (req, res) => {
   try {
-    let transactions = [];
-    
-    try {
-      const transactionCount = await Transaction.countDocuments();
-      if (transactionCount === 0) {
-        console.log('📊 No transactions in database - checking mock transactions');
-        transactions = getMockTransactions(req.user.id);
-      } else {
-        transactions = await Transaction.find({ user: req.user.id })
-          .sort({ createdAt: -1 });
-      }
-    } catch (dbError) {
-      console.log('⚠️ Database unavailable - checking mock transactions');
-      transactions = getMockTransactions(req.user.id);
+    // Only use mock data if USE_MOCK_INVESTMENTS env variable is true
+    if (process.env.USE_MOCK_INVESTMENTS === 'true') {
+      const transactions = getMockTransactions(req.user.id);
+      return res.json(transactions);
     }
-    
+    // Always fetch from database
+    const transactions = await Transaction.find({ user: req.user.id })
+      .sort({ createdAt: -1 });
+
+    // Remove debug logging code
     res.json(transactions);
   } catch (err) {
     console.error('Get transactions error:', err.message);

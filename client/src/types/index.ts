@@ -60,6 +60,7 @@ export interface Transaction {
   reference?: string;
   createdAt: string;
   completedAt?: string;
+  failureReason?: string;
 }
 
 export interface DepositData {

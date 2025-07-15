@@ -4,11 +4,12 @@ import { ArrowUpRight, ArrowDownRight, TrendingUp, AlertCircle } from 'lucide-re
 import { getTransactions } from '../../redux/thunks/walletThunks';
 import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency, formatDate } from '../../utils/formatters';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import Card from '../ui/card';
 import Spinner from '../ui/Spinner';
 import { Badge } from '../ui/Badge';
 
 const TransactionHistory: React.FC = () => {
+  console.log('TransactionHistory component loaded');
   const dispatch = useDispatch<AppDispatch>();
   const { transactions, loading, error } = useSelector((state: RootState) => state.wallet);
   
@@ -46,19 +47,21 @@ const TransactionHistory: React.FC = () => {
       </Card>
     );
   }
+
+  // Debug: Print transactions to verify failureReason
+  console.log('TransactionHistory transactions:', transactions);
   
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case 'deposit':
         return <ArrowUpRight className="h-5 w-5 text-success-500" />;
       case 'withdrawal':
-        return <ArrowDownRight className="h-5 w-5 text-danger-500" />;
       case 'investment':
-        return <TrendingUp className="h-5 w-5 text-primary-500" />;
+        return <ArrowDownRight className="h-5 w-5 text-danger-500" />;
       case 'profit':
-        return <TrendingUp className="h-5 w-5 text-success-500" />;
+        return <ArrowUpRight className="h-5 w-5 text-success-500" />;
       case 'loss':
-        return <TrendingUp className="h-5 w-5 text-danger-500" />;
+        return <ArrowDownRight className="h-5 w-5 text-danger-500" />;
       default:
         return <AlertCircle className="h-5 w-5 text-warning-500" />;
     }
@@ -99,50 +102,65 @@ const TransactionHistory: React.FC = () => {
   };
   
   return (
-    <Card title="Transaction History">
+    <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-dark-300">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Transaction
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Date
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Amount
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Status
-              </th>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-muted/50 border-b">
+              <th className="py-4 px-6 font-medium text-sm text-muted-foreground text-left" style={{width: '40%'}}>Transaction</th>
+              <th className="py-4 px-6 font-medium text-sm text-muted-foreground text-left" style={{width: '25%'}}>Date</th>
+              <th className="py-4 px-6 font-medium text-sm text-muted-foreground text-right" style={{width: '20%'}}>Amount</th>
+              <th className="py-4 px-6 font-medium text-sm text-muted-foreground text-center" style={{width: '15%'}}>Status</th>
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-dark-200 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody>
             {transactions.map((transaction) => (
-              <tr key={transaction._id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
+              <tr key={transaction._id} className="hover:bg-muted/30 transition-colors">
+                {/* Transaction column */}
+                <td className="py-4 px-6 text-left">
+                  <div className="flex items-center gap-4">
+                    <div className={`flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full
+                      ${['profit', 'deposit'].includes(transaction.type) ? 'bg-success-bg' : ''}
+                      ${['withdrawal', 'loss', 'investment'].includes(transaction.type) ? 'bg-danger-bg' : ''}
+                      ${!['profit', 'deposit', 'withdrawal', 'loss', 'investment'].includes(transaction.type) ? 'bg-muted' : ''}
+                    `}>
                       {getTransactionIcon(transaction.type)}
                     </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                    <div>
+                      <div className="text-sm font-medium text-foreground">
                         {getTransactionText(transaction.type)}
                       </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-xs text-muted-foreground font-mono">
                         {transaction.reference}
                       </div>
+                      {transaction.type === 'withdrawal' && transaction.status === 'failed' && transaction.failureReason && (
+                        <div className="text-xs text-danger mt-1 font-medium">
+                          {transaction.failureReason}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  {formatDate(transaction.createdAt, true)}
+                {/* Date column */}
+                <td className="py-4 px-6 text-left">
+                  <div className="text-sm text-foreground font-mono">
+                    {formatDate(transaction.createdAt, true)}
+                  </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                  {formatCurrency(transaction.amount)}
+                {/* Amount column */}
+                <td className="py-4 px-6 text-right">
+                  <div className="text-sm font-medium font-mono">
+                    {['profit', 'deposit'].includes(transaction.type) ? (
+                      <span className="text-success">+{formatCurrency(transaction.amount)}</span>
+                    ) : ['withdrawal', 'loss', 'investment'].includes(transaction.type) ? (
+                      <span className="text-danger">-{formatCurrency(transaction.amount)}</span>
+                    ) : (
+                      <span className="text-foreground">{formatCurrency(transaction.amount)}</span>
+                    )}
+                  </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                {/* Status column */}
+                <td className="py-4 px-6 text-center">
                   {getStatusBadge(transaction.status)}
                 </td>
               </tr>
@@ -150,7 +168,7 @@ const TransactionHistory: React.FC = () => {
           </tbody>
         </table>
       </div>
-    </Card>
+    </div>
   );
 };
 

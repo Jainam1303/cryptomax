@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Button from "@/components/ui/button";
+import Card from "@/components/ui/card";
 import { Badge } from "@/components/ui/Badge";
 import { TrendingUp, Shield, Zap, BarChart3, Wallet, Users, ArrowRight, Star } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -62,15 +62,15 @@ const Index = () => {
             <div className="flex items-center space-x-4">
               {!isLoggedIn ? (
                 <>
-                  <Button variant="ghost" asChild className="text-gray-600 hover:text-blue-600">
+                  <Button variant="ghost" className="text-gray-600 hover:text-blue-600">
                     <Link to="/login">Sign In</Link>
                   </Button>
-                  <Button asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                  <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                     <Link to="/register">Get Started</Link>
                   </Button>
                 </>
               ) : (
-                <Button asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                   <Link to="/dashboard">Dashboard</Link>
                 </Button>
               )}
@@ -101,7 +101,7 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8">
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8">
                 <Link to="/register">
                   Start Investing Now
                   <ArrowRight className="ml-2 w-4 h-4" />
@@ -126,24 +126,21 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {cryptos.map((crypto, index) => (
               <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white/80 backdrop-blur-sm border-0 shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{crypto.name}</h3>
-                      <p className="text-sm text-gray-500">{crypto.symbol}</p>
-                    </div>
-                    <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-xs">{crypto.symbol[0]}</span>
-                    </div>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{crypto.name}</h3>
+                    <p className="text-sm text-gray-500">{crypto.symbol}</p>
                   </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-gray-900">{crypto.price}</span>
-                    <Badge className={crypto.positive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
-                      {crypto.change}
-                    </Badge>
+                  <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-xs">{crypto.symbol[0]}</span>
                   </div>
-                </CardContent>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-gray-900">{crypto.price}</span>
+                  <Badge className={crypto.positive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
+                    {crypto.change}
+                  </Badge>
+                </div>
               </Card>
             ))}
           </div>
@@ -205,7 +202,7 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8">
               <Link to="/register">Create Free Account</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-gray-300 hover:border-blue-300">

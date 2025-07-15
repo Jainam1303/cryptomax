@@ -5,9 +5,9 @@ import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency } from '../../utils/formatters';
 import { isValidAmount } from '../../utils/validators';
 import { Crypto } from '../../types';
-import Input from '../ui/Input';
-import Button from '../ui/Button';
-import Alert from '../ui/Alert';
+import { Input } from '../ui/Input';
+import Button from '../ui/button';
+import { Alert, AlertDescription } from '../ui/Alert';
 
 interface InvestmentFormProps {
   crypto: Crypto;
@@ -68,25 +68,19 @@ const InvestmentForm: React.FC<InvestmentFormProps> = ({ crypto, onSuccess }) =>
   
   return (
     <div>
-      {error && (
-        <Alert
-          variant="danger"
-          message={error}
-          className="mb-4"
-        />
-      )}
+      <Alert variant="destructive" className="mb-4">
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
       
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
           <Input
-            label="Investment Amount (USD)"
             type="number"
             name="amount"
             id="amount"
             value={amount}
             onChange={handleChange}
             placeholder="Enter amount"
-            error={formError}
             min="10"
             step="0.01"
             required

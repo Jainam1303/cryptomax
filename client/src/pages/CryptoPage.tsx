@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import Card from "@/components/ui/card";
+import Button from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -11,6 +11,29 @@ import { useCrypto } from '../context/CryptoContext';
 import { useInvestment } from '../context/InvestmentContext';
 import { useWallet } from '../context/WalletContext';
 import { useAuth } from '../context/AuthContext';
+import { io as socketIOClient } from 'socket.io-client';
+import api from '../services/api';
+
+// Define a local Crypto type for this file
+interface Crypto {
+  _id: string;
+  name: string;
+  symbol: string;
+  image?: string;
+  currentPrice: number;
+  minPrice?: number;
+  maxPrice?: number;
+  minChangePct?: number;
+  maxChangePct?: number;
+  adminFluctuationEnabled?: boolean;
+  marketCap?: number;
+  volume24h?: number;
+  circulatingSupply?: number;
+  priceChange24h?: number;
+  priceChangePercentage24h?: number;
+  isActive?: boolean;
+  direction?: 'up' | 'down' | 'random';
+}
 
 const CryptoPage = () => {
   const { cryptos, filteredCryptos, loading, searchQuery, setSearchQuery, getCryptos } = useCrypto();
@@ -21,10 +44,34 @@ const CryptoPage = () => {
   const [selectedCrypto, setSelectedCrypto] = useState<any>(null);
   const [investmentAmount, setInvestmentAmount] = useState('');
   const [isBuyDialogOpen, setIsBuyDialogOpen] = useState(false);
+  const [tickerCryptos, setTickerCryptos] = useState<Crypto[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [socket, setSocket] = useState<any>(null);
 
+  // Initial fetch for cryptos on mount
   useEffect(() => {
-    getCryptos();
-    getWallet();
+    async function fetchInitialCryptos() {
+      try {
+        const res = await api.get('/api/cryptos');
+        setTickerCryptos(res.data);
+      } catch (err) {
+        // Optionally handle error
+      }
+    }
+    fetchInitialCryptos();
+  }, []);
+
+  // Connect to socket.io and listen for updates
+  useEffect(() => {
+    const socket = socketIOClient('http://localhost:5000');
+    setSocket(socket);
+    socket.on('cryptos:update', (updatedCryptos: Crypto[]) => {
+      setTickerCryptos(updatedCryptos);
+      setLastUpdated(new Date());
+    });
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const handleBuyInvestment = async (e: React.FormEvent) => {
@@ -87,7 +134,7 @@ const CryptoPage = () => {
 
         {/* Wallet Balance */}
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg mb-8">
-          <CardContent className="p-6">
+          <div className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Available Balance</h3>
@@ -97,12 +144,12 @@ const CryptoPage = () => {
               </div>
               <DollarSign className="h-12 w-12 text-gray-400" />
             </div>
-          </CardContent>
+          </div>
         </Card>
 
         {/* Search */}
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg mb-8">
-          <CardContent className="p-6">
+          <div className="p-6">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -112,33 +159,39 @@ const CryptoPage = () => {
                 className="pl-10"
               />
             </div>
-          </CardContent>
+          </div>
         </Card>
 
         {/* Crypto List */}
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle>Available Cryptocurrencies</CardTitle>
-            <CardDescription>Click on any cryptocurrency to invest</CardDescription>
-          </CardHeader>
-          <CardContent>
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Available Cryptocurrencies</h2>
+            <p className="text-gray-600 mb-4">Click on any cryptocurrency to invest</p>
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredCryptos.length > 0 ? (
-                  filteredCryptos.map((crypto) => (
+                {tickerCryptos.length > 0 ? (
+                  tickerCryptos.filter(crypto =>
+                    crypto.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    crypto.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+                  ).map((crypto) => (
                     <div
                       key={crypto._id}
                       className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer"
                       onClick={() => openBuyDialog(crypto)}
                     >
                       <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold">{crypto.symbol[0]}</span>
-                        </div>
+                        {/* Show crypto image */}
+                        {crypto.image ? (
+                          <img src={crypto.image} alt={crypto.symbol} className="w-12 h-12 rounded-full object-cover" />
+                        ) : (
+                          <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center">
+                            <span className="text-white font-bold">{crypto.symbol[0]}</span>
+                          </div>
+                        )}
                         <div>
                           <div className="font-semibold text-gray-900">{crypto.name}</div>
                           <div className="text-sm text-gray-500">{crypto.symbol}</div>
@@ -165,6 +218,7 @@ const CryptoPage = () => {
                             {crypto.priceChangePercentage24h.toFixed(2)}%
                           </Badge>
                         </div>
+                        <div className="text-xs text-gray-400 mt-1 text-right">Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : ''}</div>
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-gray-500">Market Cap</div>
@@ -187,7 +241,7 @@ const CryptoPage = () => {
                 )}
               </div>
             )}
-          </CardContent>
+          </div>
         </Card>
 
         {/* Buy Investment Dialog */}
