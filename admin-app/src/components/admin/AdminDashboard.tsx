@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Users, DollarSign, TrendingUp, Clock, ArrowUp, ArrowDown } from 'lucide-react';
+import { Users, DollarSign, Clock, ArrowUp } from 'lucide-react';
 import { getDashboardData } from '../../redux/thunks/adminThunks';
 import type { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency } from '../../utils/formatters';

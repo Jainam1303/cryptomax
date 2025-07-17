@@ -19,7 +19,7 @@ const SystemSettings: React.FC = () => {
   const [trend, setTrend] = useState<string>('0');
   
   useEffect(() => {
-    dispatch(getCryptos());
+    dispatch(getCryptos() as any);
   }, [dispatch]);
   
   const handleUpdateSettings = (id: string, currentVolatility: number, currentTrend: number) => {
@@ -35,7 +35,7 @@ const SystemSettings: React.FC = () => {
       id: selectedCrypto,
       volatility: parseFloat(volatility),
       trend: parseFloat(trend)
-    }));
+    }) as any);
     setIsModalOpen(false);
     setSelectedCrypto(null);
   };
@@ -198,7 +198,6 @@ const SystemSettings: React.FC = () => {
       >
         <div className="space-y-4">
           <Input
-            label="Volatility (0.01 to 0.5)"
             type="number"
             name="volatility"
             id="volatility"
@@ -213,7 +212,6 @@ const SystemSettings: React.FC = () => {
             Higher volatility means larger price swings. For example, 0.05 means prices can vary by up to 15% in a single update.
           </p>
           <Input
-            label="Trend (-1 to 1)"
             type="number"
             name="trend"
             id="trend"

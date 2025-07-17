@@ -6,7 +6,6 @@ import { Badge } from '../ui/Badge';
 import Spinner from '../ui/Spinner';
 import { Copy, Check } from 'lucide-react';
 import api from '../../services/api';
-import Modal from '../ui/Modal';
 
 const WithdrawalRequests: React.FC = () => {
   const [withdrawalRequests, setWithdrawalRequests] = useState<any[]>([]);
@@ -40,8 +39,7 @@ const WithdrawalRequests: React.FC = () => {
   const handleAction = async (id: string, status: 'approved' | 'rejected' | 'completed') => {
     setActionLoading(id + status);
     try {
-      const response = await api.put(`/api/admin/withdrawal-requests/${id}`, { status });
-      // Update the transaction status instead of removing it
+      await api.put(`/api/admin/withdrawal-requests/${id}`, { status });
       setWithdrawalRequests((prev) => 
         prev.map((w) => 
           w._id === id ? { ...w, status } : w

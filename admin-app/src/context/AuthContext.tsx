@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import api, { setAuthToken } from '../services/api';
-import { useDispatch } from 'react-redux';
 // import { useToast } from '../hooks/use-toast'; // Uncomment if you migrate use-toast
 // import { loginSuccess, userLoaded, logout as reduxLogout } from '../redux/slices/authSlice'; // Uncomment if you migrate authSlice
 
@@ -43,7 +42,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
   // const { toast } = useToast(); // Uncomment if you migrate use-toast
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   // Load user on component mount
   useEffect(() => {
@@ -93,7 +92,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // dispatch(userLoaded(user));
       // toast({ title: "Login Successful", description: `Welcome back, ${user.name}!`, });
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Login failed';
+      // const errorMessage = error.response?.data?.message || 'Login failed';
       // toast({ title: "Login Failed", description: errorMessage, variant: "destructive", });
       throw error;
     } finally {
@@ -115,7 +114,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // dispatch(userLoaded(user));
       // toast({ title: "Registration Successful", description: `Welcome to CryptoMax, ${user.name}!`, });
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Registration failed';
+      // const errorMessage = error.response?.data?.message || 'Registration failed';
       // toast({ title: "Registration Failed", description: errorMessage, variant: "destructive", });
       throw error;
     } finally {
