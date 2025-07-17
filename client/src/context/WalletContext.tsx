@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useToast } from '../hooks/use-toast';
 import api from '../services/api';
+import { useAuth } from './AuthContext';
 
 interface Wallet {
   _id: string;
@@ -56,6 +57,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   const getWallet = async () => {
     try {
@@ -73,6 +75,18 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
       setLoading(false);
     }
   };
+
+  // Automatically fetch wallet on mount and when user logs in
+  useEffect(() => {
+    if (isAuthenticated) {
+      getWallet();
+      getTransactions();
+    } else {
+      // Clear wallet state on logout
+      setWallet(null);
+      setTransactions([]);
+    }
+  }, [isAuthenticated]);
 
   const getTransactions = async () => {
     try {
@@ -98,13 +112,13 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
         amount,
         paymentMethod
       });
-      
-      setWallet(response.data.wallet);
+      // Do NOT update wallet balance or show 'Deposit Successful' yet
+      // Only show pending toast
       toast({
-        title: "Deposit Successful",
-        description: `$${amount} has been deposited to your wallet`,
+        title: "Deposit Request Submitted",
+        description: `Your deposit of $${amount} is pending admin approval.`,
       });
-      // Refresh wallet and transactions
+      // Refresh wallet and transactions to show pending deposit
       await getWallet();
       await getTransactions();
     } catch (error: any) {

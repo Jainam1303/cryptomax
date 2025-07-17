@@ -200,9 +200,23 @@ const PortfolioPage: React.FC = () => {
                     return (
                       <div key={investment._id} className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50">
                         <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">{investment.crypto.symbol[0]}</span>
-                          </div>
+                          {investment.crypto.image ? (
+                            <img
+                              src={investment.crypto.image}
+                              alt={investment.crypto.symbol}
+                              className="w-12 h-12 rounded-full object-cover"
+                            />
+                          ) : investment.crypto.symbol === 'BTC' ? (
+                            <img
+                              src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+                              alt="Bitcoin"
+                              className="w-12 h-12 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center">
+                              <span className="text-white font-bold">{investment.crypto.symbol[0]}</span>
+                            </div>
+                          )}
                           <div>
                             <div className="font-semibold text-gray-900">{investment.crypto.name}</div>
                             <div className="text-sm text-gray-500">

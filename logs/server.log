@@ -6,3 +6,5 @@
 Server running on port 5000
 ❌ MongoDB connection error: connect ECONNREFUSED 127.0.0.1:27017
 ⚠️ App will continue without database (using mock data).
+
+npm install vite-plugin-javascript-obfuscator --save-dev

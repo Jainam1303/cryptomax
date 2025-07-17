@@ -5,6 +5,17 @@ const path = require('path');
 let mockInvestments = {};
 let mockTransactions = {};
 
+// Global mock transactions for admin panel (simplified approach)
+let globalMockTransactions = [];
+
+// Function to update global transactions
+const updateGlobalTransaction = (transactionId, updatedTransaction) => {
+  const index = globalMockTransactions.findIndex(tx => tx._id === transactionId);
+  if (index !== -1) {
+    globalMockTransactions[index] = updatedTransaction;
+  }
+};
+
 // Load shared mock investments from JSON file
 const loadSharedMockInvestments = () => {
   try {
@@ -61,7 +72,17 @@ const storeMockTransaction = (userId, transaction) => {
     mockTransactions[userId] = [];
   }
   mockTransactions[userId].push(transaction);
+  
+  // Also store in global transactions for admin panel
+  const globalTransaction = {
+    ...transaction,
+    user: { name: 'Mock User', email: 'mock@example.com' }
+  };
+  globalMockTransactions.push(globalTransaction);
+  
   console.log('📊 Stored mock transaction for user:', userId);
+  console.log('📊 Global transactions count:', globalMockTransactions.length);
+  console.log('📊 Transaction details:', globalTransaction);
 };
 
 // Get mock investments for user (now returns shared investments + user-specific)
@@ -86,6 +107,11 @@ const getMockTransactions = (userId) => {
   return mockTransactions[userId] || [];
 };
 
+// Get all mock transactions (for admin panel)
+const getAllMockTransactions = () => {
+  return globalMockTransactions;
+};
+
 // Clear mock data for user (useful for testing)
 const clearMockData = (userId) => {
   delete mockInvestments[userId];
@@ -93,12 +119,23 @@ const clearMockData = (userId) => {
   console.log('🗑️ Cleared mock data for user:', userId);
 };
 
+// Clear all global mock data (useful for testing)
+const clearAllMockData = () => {
+  globalMockTransactions = [];
+  mockInvestments = {};
+  mockTransactions = {};
+  console.log('🗑️ Cleared all mock data');
+};
+
 module.exports = {
   storeMockInvestment,
   storeMockTransaction,
   getMockInvestments,
   getMockTransactions,
+  getAllMockTransactions,
+  updateGlobalTransaction,
   clearMockData,
+  clearAllMockData,
   loadSharedMockInvestments,
   updateInvestmentValues
 };

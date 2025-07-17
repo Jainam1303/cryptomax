@@ -30,13 +30,13 @@ const loadMockCryptos = () => {
 // @access  Private
 exports.getInvestments = async (req, res) => {
   try {
-    // Only use mock data if USE_MOCK_INVESTMENTS env variable is true
-    if (process.env.USE_MOCK_INVESTMENTS === 'true') {
+    // Use mock data if USE_MOCK_INVESTMENTS is true or database is not available
+    if (process.env.USE_MOCK_INVESTMENTS === 'true' || !process.env.MONGO_URI) {
       const cryptos = loadMockCryptos();
       const investments = getMockInvestments(req.user.id, cryptos);
       return res.json(investments);
     }
-    // Always fetch from database
+    // Try to fetch from database
     const investments = await Investment.find({ 
       user: req.user.id,
       status: 'active'
@@ -161,13 +161,13 @@ exports.sellInvestment = async (req, res) => {
 // @access  Private
 exports.getPortfolio = async (req, res) => {
   try {
-    // Only use mock data if USE_MOCK_INVESTMENTS env variable is true
-    if (process.env.USE_MOCK_INVESTMENTS === 'true') {
+    // Use mock data if USE_MOCK_INVESTMENTS is true or database is not available
+    if (process.env.USE_MOCK_INVESTMENTS === 'true' || !process.env.MONGO_URI) {
       const cryptos = loadMockCryptos();
       const investments = getMockInvestments(req.user.id, cryptos);
       return res.json({ investments, summary: {} });
     }
-    // Always fetch from database
+    // Try to fetch from database
     const investments = await Investment.find({ 
       user: req.user.id,
       status: 'active'

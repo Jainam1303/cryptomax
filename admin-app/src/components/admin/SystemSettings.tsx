@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCryptos, updateCryptoSettings } from '../../redux/thunks/adminThunks';
-import { RootState, AppDispatch } from '../../redux/store';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
 import Card from '../ui/card';
 import Button from '../ui/button';
 import { Input } from '../ui/Input';
 import Spinner from '../ui/Spinner';
 import Modal from '../ui/Modal';
-import { Alert } from '../ui/Alert';
+// import { Alert } from '../ui/Alert'; // Uncomment and migrate Alert if needed
 
 const SystemSettings: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { cryptos, loading, error } = useSelector((state: RootState) => state.admin);
+  const dispatch = useDispatch();
+  const { cryptos, loading, error } = useSelector((state: any) => state.admin);
   
   const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -32,20 +31,18 @@ const SystemSettings: React.FC = () => {
   
   const handleSubmit = async () => {
     if (!selectedCrypto) return;
-    
     await dispatch(updateCryptoSettings({
       id: selectedCrypto,
       volatility: parseFloat(volatility),
       trend: parseFloat(trend)
     }));
-    
     setIsModalOpen(false);
     setSelectedCrypto(null);
   };
   
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="loading-container">
         <Spinner size="lg" />
       </div>
     );
@@ -68,14 +65,14 @@ const SystemSettings: React.FC = () => {
             Configure the volatility and trend of cryptocurrency prices. These settings control how prices are simulated for the demo platform.
           </p>
         </div>
-        
+        {/*
         <Alert
           variant="warning"
           title="Important Notice"
           message="These settings are for demonstration purposes only. In a production environment, cryptocurrency prices would be fetched from real market data."
           className="mb-6"
         />
-        
+        */}
         {cryptos?.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">No cryptocurrencies found</p>
@@ -106,7 +103,7 @@ const SystemSettings: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-dark-200 divide-y divide-gray-200 dark:divide-gray-700">
-                {cryptos?.map((crypto) => (
+                {cryptos?.map((crypto: any) => (
                   <tr key={crypto._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -178,7 +175,6 @@ const SystemSettings: React.FC = () => {
           </div>
         )}
       </Card>
-      
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -214,9 +210,8 @@ const SystemSettings: React.FC = () => {
             step="0.01"
           />
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Higher volatility means larger price swings. For example, 0.05 means prices can vary by up to ±5% in a single update.
+            Higher volatility means larger price swings. For example, 0.05 means prices can vary by up to 15% in a single update.
           </p>
-          
           <Input
             label="Trend (-1 to 1)"
             type="number"
@@ -232,15 +227,16 @@ const SystemSettings: React.FC = () => {
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Trend influences the direction of price movements. -1 means strong downtrend, 0 means neutral, and 1 means strong uptrend.
           </p>
-          
+          {/*
           <Alert
             variant="info"
             message="These settings control the simulated price movements for the demo platform. Changes will affect how prices are generated for all users."
           />
+          */}
         </div>
       </Modal>
     </div>
   );
 };
 
-export default SystemSettings;
+export default SystemSettings; 

@@ -68,12 +68,12 @@ const InvestmentList: React.FC = () => {
                 {investment.crypto.image ? (
                   <img
                     src={investment.crypto.image}
-                    alt={investment.crypto.name}
-                    className="w-10 h-10 rounded-full mr-3"
+                    alt={investment.crypto.symbol}
+                    className="w-12 h-12 rounded-full object-cover mr-3"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mr-3">
-                    <span className="text-primary-500 font-bold">{investment.crypto.symbol.charAt(0)}</span>
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white font-bold">{investment.crypto.symbol[0]}</span>
                   </div>
                 )}
                 <div>

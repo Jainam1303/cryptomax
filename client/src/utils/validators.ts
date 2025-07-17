@@ -31,12 +31,8 @@ export const isValidWithdrawalAmount = (amount: string | number, balance: number
 // Validate payment details
 export const validatePaymentDetails = (paymentMethod: string, details: any): boolean => {
   switch (paymentMethod) {
-    case 'bank_transfer':
-      return !!details.accountName && !!details.accountNumber && !!details.bankName;
     case 'crypto':
       return !!details.walletAddress && !!details.network;
-    case 'paypal':
-      return isValidEmail(details.email);
     default:
       return false;
   }

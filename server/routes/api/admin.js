@@ -64,7 +64,11 @@ router.put('/deposit-wallets/:coin', adminController.updateDepositWallet);
 router.post('/deposit-wallets/:coin/qr-upload', upload.single('qr'), adminController.uploadDepositWalletQr);
 
 // Admin: List all pending deposit requests
-router.get('/deposit-requests', adminController.getDepositRequests);
+router.get('/deposit-requests', (req, res, next) => { 
+  console.log('🔍 GET /api/admin/deposit-requests called');
+  console.log('👤 User making request:', req.user);
+  next(); 
+}, adminController.getDepositRequests);
 // Admin: Approve/reject a deposit request
 router.put('/deposit-requests/:id', adminController.processDepositRequest);
 

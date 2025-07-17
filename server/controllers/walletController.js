@@ -1,7 +1,6 @@
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
 const WithdrawalRequest = require('../models/WithdrawalRequest');
-const { getMockTransactions } = require('../utils/mockDataManager');
 
 // @route   GET api/wallet
 // @desc    Get user wallet
@@ -15,6 +14,14 @@ exports.getWallet = async (req, res) => {
       { $group: { _id: null, total: { $sum: '$amount' } } }
     ]);
     wallet.pendingWithdrawals = pending.length > 0 ? pending[0].total : 0;
+
+    // Dynamically calculate total withdrawn (completed withdrawals)
+    const completedWithdrawals = await Transaction.aggregate([
+      { $match: { user: wallet.user, type: 'withdrawal', status: 'completed' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    wallet.totalWithdrawn = completedWithdrawals.length > 0 ? completedWithdrawals[0].total : 0;
+
     res.json(wallet);
   } catch (err) {
     console.error('Get wallet error:', err.message);
@@ -29,8 +36,20 @@ exports.deposit = async (req, res) => {
   try {
     const { amount, paymentMethod, txid } = req.body;
     
+    console.log('💰 Deposit request received:', { amount, paymentMethod, txid, userId: req.user.id });
+    
     if (amount <= 0) {
       return res.status(400).json({ msg: 'Amount must be greater than 0' });
+    }
+    
+    // Check database connection
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      console.log('❌ Database not connected during deposit. ReadyState:', mongoose.connection.readyState);
+      return res.status(500).json({ 
+        msg: 'Database not connected. Please check MongoDB connection.',
+        error: 'Database connection failed'
+      });
     }
     
     // Use wallet from middleware
@@ -43,10 +62,21 @@ exports.deposit = async (req, res) => {
       amount,
       status: 'pending',
       description: `Deposit via ${paymentMethod}`,
-      txid: txid || ''
+      txid: txid || '',
+      currency: 'USD'
     });
     
+    console.log('📊 Creating deposit transaction:', {
+      userId: req.user.id,
+      amount,
+      paymentMethod,
+      txid,
+      transactionId: transaction._id
+    });
+    
+    // Save to database
     await transaction.save();
+    console.log('✅ Deposit transaction saved to database:', transaction._id);
     
     // Do NOT credit wallet balance yet; wait for admin approval
     // Optionally, you can store a pendingDeposits field in wallet if you want
@@ -58,7 +88,7 @@ exports.deposit = async (req, res) => {
     });
   } catch (err) {
     console.error('Deposit error:', err.message);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: 'Server error', error: err.message });
   }
 };
 
@@ -67,7 +97,21 @@ exports.deposit = async (req, res) => {
 // @access  Private
 exports.requestWithdrawal = async (req, res) => {
   try {
+    console.log('RAW req.body:', JSON.stringify(req.body, null, 2));
     const { amount, paymentMethod, paymentDetails } = req.body;
+
+    // Always store paymentDetails as a string
+    let details = paymentDetails;
+    if (typeof paymentDetails === 'object' && paymentDetails !== null && paymentDetails.walletAddress) {
+      details = paymentDetails.walletAddress;
+    }
+
+    console.log('💰 Withdrawal request received:', { 
+      amount, 
+      paymentMethod, 
+      paymentDetails: details, 
+      userId: req.user.id 
+    });
     
     if (amount <= 0) {
       return res.status(400).json({ msg: 'Amount must be greater than 0' });
@@ -85,10 +129,19 @@ exports.requestWithdrawal = async (req, res) => {
       user: req.user.id,
       amount,
       paymentMethod,
-      paymentDetails
+      paymentDetails: details // store as string
+    });
+    
+    console.log('📊 Creating withdrawal request:', {
+      userId: req.user.id,
+      amount,
+      paymentMethod,
+      paymentDetails: details,
+      withdrawalRequestId: withdrawalRequest._id
     });
     
     await withdrawalRequest.save();
+    console.log('✅ Withdrawal request saved to database:', withdrawalRequest._id);
     
     // Create transaction record (pending)
     const transaction = new Transaction({
@@ -100,11 +153,16 @@ exports.requestWithdrawal = async (req, res) => {
     });
     
     await transaction.save();
+    console.log('✅ Withdrawal transaction saved to database:', transaction._id);
     
     // Update wallet (hold the funds)
     wallet.pendingWithdrawals += amount;
     wallet.balance -= amount;
     await wallet.save();
+    console.log('✅ Wallet updated:', {
+      newBalance: wallet.balance,
+      pendingWithdrawals: wallet.pendingWithdrawals
+    });
     
     res.json({
       success: true,
@@ -122,16 +180,8 @@ exports.requestWithdrawal = async (req, res) => {
 // @access  Private
 exports.getTransactions = async (req, res) => {
   try {
-    // Only use mock data if USE_MOCK_INVESTMENTS env variable is true
-    if (process.env.USE_MOCK_INVESTMENTS === 'true') {
-      const transactions = getMockTransactions(req.user.id);
-      return res.json(transactions);
-    }
-    // Always fetch from database
     const transactions = await Transaction.find({ user: req.user.id })
       .sort({ createdAt: -1 });
-
-    // Remove debug logging code
     res.json(transactions);
   } catch (err) {
     console.error('Get transactions error:', err.message);

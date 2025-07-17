@@ -66,6 +66,7 @@ export interface Transaction {
 export interface DepositData {
   amount: number;
   paymentMethod: string;
+  txid?: string;
 }
 
 export interface WithdrawalData {

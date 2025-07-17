@@ -17,7 +17,10 @@ connectDB(); // 👈 uses process.env.MONGO_URI
 // Middleware
 app.use(express.json({ extended: false }));
 const corsOptions = {
-  origin: 'http://localhost:8080',
+  origin: [
+    'http://localhost:8080',
+    'http://localhost:5173'
+  ],
   credentials: true
 };
 app.use(cors(corsOptions));
@@ -41,7 +44,10 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:8080',
+    origin: [
+      'http://localhost:8080',
+      'http://localhost:5173'
+    ],
     methods: ['GET', 'POST']
   }
 });

@@ -8,3 +8,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+declare module 'vite-plugin-obfuscator';
+declare module 'vite-plugin-javascript-obfuscator';

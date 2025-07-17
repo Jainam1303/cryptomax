@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getUsers, getWithdrawalRequests, getInvestments, getDashboardData } from '../thunks/adminThunks';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { getUsers, getWithdrawalRequests, processWithdrawalRequest, getDashboardData } from '../thunks/adminThunks';
 
 interface AdminState {
   users: any[];
@@ -73,18 +74,24 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      .addCase(getInvestments.pending, (state) => {
+      .addCase(processWithdrawalRequest.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getInvestments.fulfilled, (state, action) => {
+      .addCase(processWithdrawalRequest.fulfilled, (state, action) => {
         state.loading = false;
-        state.investments = action.payload;
+        // Update the specific withdrawal request in the array
+        const updatedRequest = action.payload;
+        const index = state.withdrawalRequests.findIndex(req => req._id === updatedRequest._id);
+        if (index !== -1) {
+          state.withdrawalRequests[index] = updatedRequest;
+        }
       })
-      .addCase(getInvestments.rejected, (state, action) => {
+      .addCase(processWithdrawalRequest.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
+      // Add getDashboardData reducers
       .addCase(getDashboardData.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -110,4 +117,4 @@ export const {
   setAdminError
 } = adminSlice.actions;
 
-export default adminSlice.reducer;
+export default adminSlice.reducer; 

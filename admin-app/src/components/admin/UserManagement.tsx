@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Search, User, Mail, Calendar, Clock } from 'lucide-react';
 import { getUsers } from '../../redux/thunks/adminThunks';
-import { RootState, AppDispatch } from '../../redux/store';
-import { formatDate } from '../../utils/formatters';
-import Card from '../ui/card';
-import { Input } from '../ui/Input';
-import { Badge } from '../ui/Badge';
-import Spinner from '../ui/Spinner';
+import type { RootState, AppDispatch } from '../../redux/store';
+import { formatDate, formatCurrency } from '../../utils/formatters';
+import Card from '../../components/ui/card';
+import { Input } from '../../components/ui/Input';
+import { Badge } from '../../components/ui/Badge';
+import Spinner from '../../components/ui/Spinner';
 
 const UserManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -29,7 +29,7 @@ const UserManagement: React.FC = () => {
   
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="loading-container">
         <Spinner size="lg" />
       </div>
     );
@@ -83,6 +83,15 @@ const UserManagement: React.FC = () => {
                     Status
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Total Deposited
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Total Withdrawn
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Investments
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Joined
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -132,6 +141,21 @@ const UserManagement: React.FC = () => {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900 dark:text-white">
+                        {formatCurrency(user.totalDeposited || 0)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900 dark:text-white">
+                        {formatCurrency(user.totalWithdrawn || 0)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900 dark:text-white">
+                        {user.investments || 0}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 text-gray-400 mr-2" />
                         <span className="text-sm text-gray-900 dark:text-white">
@@ -158,4 +182,4 @@ const UserManagement: React.FC = () => {
   );
 };
 
-export default UserManagement;
+export default UserManagement; 

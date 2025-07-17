@@ -103,13 +103,6 @@ const DashboardPage = () => {
             
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">Welcome, {user?.name}</span>
-              {user?.role === 'admin' && (
-                <Link to="/admin">
-                  <Button variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50">
-                    Admin Panel
-                  </Button>
-                </Link>
-              )}
               <Link to="/crypto">
                 <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                   <Plus className="w-4 h-4 mr-2" />
@@ -239,7 +232,9 @@ const DashboardPage = () => {
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <div className="flex items-center justify-between px-6 pt-6">
               <span className="flex items-center font-semibold text-lg">Your Holdings</span>
-              <Button variant="outline" size="sm">View All</Button>
+              <Link to="/portfolio">
+                <Button variant="outline" size="sm">View All</Button>
+              </Link>
             </div>
             <div className="px-6 pb-6">
               <div className="space-y-4">
@@ -254,9 +249,23 @@ const DashboardPage = () => {
                     return (
                       <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors">
                         <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold text-xs">{investment.crypto.symbol[0]}</span>
-                          </div>
+                          {investment.crypto.image ? (
+                            <img
+                              src={investment.crypto.image}
+                              alt={investment.crypto.symbol}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : investment.crypto.symbol === 'BTC' ? (
+                            <img
+                              src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+                              alt="Bitcoin"
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">{investment.crypto.symbol[0]}</span>
+                            </div>
+                          )}
                           <div>
                             <div className="font-semibold text-gray-900">{investment.crypto.name}</div>
                             <div className="text-sm text-gray-500">{invQuantity} {investment.crypto.symbol}</div>
@@ -287,7 +296,9 @@ const DashboardPage = () => {
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <div className="flex items-center justify-between px-6 pt-6">
               <span className="flex items-center font-semibold text-lg">Recent Activity</span>
-              <Button variant="outline" size="sm">View All</Button>
+              <Link to="/transactions">
+                <Button variant="outline" size="sm">View All</Button>
+              </Link>
             </div>
             <div className="px-6 pb-6">
               <div className="space-y-4">

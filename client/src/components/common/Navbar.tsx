@@ -68,7 +68,15 @@ const Navbar: React.FC = () => {
                   <Wallet className="w-4 h-4 inline mr-1" />
                   Wallet
                 </Link>
-                
+                {/* Admin Panel Link - Only for admins */}
+                {user?.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className="text-purple-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors border border-purple-400"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
                 {/* User Menu */}
                 <div className="flex items-center space-x-4">
                   <div className="text-gray-300 text-sm">
@@ -151,6 +159,16 @@ const Navbar: React.FC = () => {
                     <Wallet className="w-4 h-4 inline mr-1" />
                     Wallet
                   </Link>
+                  {/* Admin Panel Link - Only for admins */}
+                  {user?.role === 'admin' && (
+                    <Link
+                      to="/admin"
+                      className="text-purple-400 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors border border-purple-400"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
                   <div className="border-t border-white/10 pt-4 mt-4">
                     <div className="text-gray-300 px-3 py-2 text-sm">
                       Welcome, {user?.name}

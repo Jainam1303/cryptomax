@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
-import { WithdrawalData } from '../../types';
+import { DepositData, WithdrawalData } from '../../types';
 
 // ✅ Get wallet balance & summary
 export const getWallet = createAsyncThunk(
@@ -31,7 +31,7 @@ export const getTransactions = createAsyncThunk(
 // ✅ Deposit funds
 export const deposit = createAsyncThunk(
   'wallet/deposit',
-  async (data: { amount: number; paymentMethod: string }, thunkAPI) => {
+  async (data: DepositData, thunkAPI) => {
     try {
       const res = await api.post('/api/wallet/deposit', data);
       return res.data;

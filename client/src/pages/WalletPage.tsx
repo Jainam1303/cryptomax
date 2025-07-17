@@ -9,6 +9,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Wallet, Plus, Minus, ArrowLeft, TrendingUp, TrendingDown, DollarSign, Loader2 } from "lucide-react";
 import { useWallet } from '../context/WalletContext';
 import { useAuth } from '../context/AuthContext';
+import DepositForm from '../components/wallet/DepositForm';
 
 const WalletPage = () => {
   const { wallet, transactions, loading, getWallet, getTransactions, deposit, withdraw } = useWallet();
@@ -67,6 +68,12 @@ const WalletPage = () => {
     getTransactions();
     getWallet();
   };
+
+  // Calculate completed and pending deposits
+  const completedDeposits = transactions.filter(t => t.type === 'deposit' && t.status === 'completed');
+  const pendingDeposits = transactions.filter(t => t.type === 'deposit' && t.status === 'pending');
+  const totalDeposited = completedDeposits.reduce((sum, t) => sum + t.amount, 0);
+  const pendingDepositsAmount = pendingDeposits.reduce((sum, t) => sum + t.amount, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -128,9 +135,9 @@ const WalletPage = () => {
             </div>
             <div className="px-6 pb-6">
               <div className="text-2xl font-bold text-green-600">
-                ${wallet?.totalDeposited?.toLocaleString() || '0.00'}
+                ${totalDeposited.toLocaleString()}
               </div>
-              <p className="text-xs text-gray-600 mt-1">All time deposits</p>
+              <p className="text-xs text-gray-600 mt-1">All time deposits (approved)</p>
             </div>
           </Card>
 
@@ -159,6 +166,19 @@ const WalletPage = () => {
               <p className="text-xs text-gray-600 mt-1">Pending transactions</p>
             </div>
           </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6">
+              <span className="text-sm font-medium text-gray-600">Pending Deposits</span>
+              <TrendingUp className="h-4 w-4 text-yellow-600" />
+            </div>
+            <div className="px-6 pb-6">
+              <div className="text-2xl font-bold text-yellow-600">
+                ${pendingDepositsAmount.toLocaleString()}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">Deposits awaiting approval</p>
+            </div>
+          </Card>
         </div>
 
         {/* Action Buttons */}
@@ -177,42 +197,7 @@ const WalletPage = () => {
                   Add money to your CryptoMax wallet to start investing.
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleDeposit} className="space-y-4">
-                <div>
-                  <Label htmlFor="deposit-amount">Amount</Label>
-                  <Input
-                    id="deposit-amount"
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    placeholder="Enter amount"
-                    value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="deposit-method">Payment Method</Label>
-                  <Select value={depositMethod} onValueChange={setDepositMethod} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select payment method" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-900">
-                      <SelectItem value="usdt">USDT (Tether)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    'Deposit Funds'
-                  )}
-                </Button>
-              </form>
+              <DepositForm />
             </DialogContent>
           </Dialog>
 
