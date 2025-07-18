@@ -19,7 +19,9 @@ app.use(express.json({ extended: false }));
 const corsOptions = {
   origin: [
     'http://localhost:8080',
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'https://cryptomax-4d3ejeovp-johns-projects-617e0ae6.vercel.app',
+    'https://cryptomax-veqf-fm6z15t91-johns-projects-617e0ae6.vercel.app/'
   ],
   credentials: true
 };
